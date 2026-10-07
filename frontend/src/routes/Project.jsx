@@ -18,6 +18,8 @@ const Project = () => {
     window.scrollTo(0, 0);
 
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const projectResponse = await api.get(`/api/projects/${projectId}`);
         setProject(projectResponse.data.project);
@@ -34,7 +36,11 @@ const Project = () => {
       }
     };
 
-    if (projectId) fetchData();
+    if (projectId) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
   }, [projectId, docId]);
 
   if (loading) {

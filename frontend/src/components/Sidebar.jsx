@@ -77,7 +77,7 @@ const Sidebar = ({ children }) => {
 
             <ul className="menu bg-base-200 rounded-box w-9/10">
               <li>
-                <label htmlFor="project-modal" className="btn flex justify-start w-full mb-4">
+                <label htmlFor="projet-modal" className="btn flex justify-start w-full mb-4">
                   <MdAdd /> Nouveau Projet
                 </label>
               </li>

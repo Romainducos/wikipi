@@ -52,7 +52,10 @@ export const getProjects = async (req, res) => {
   try {
     const [projects] = await pool.query(
       `SELECT id, title, description, created_by, created_at 
-      FROM projects ORDER BY created_at DESC`
+      FROM projects
+      WHERE created_by = ? OR is_public = 1
+      ORDER BY created_at DESC`,
+      [req.userId]
     );
 
     res.status(200).json({ projects });

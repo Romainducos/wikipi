@@ -63,9 +63,10 @@ export const login = async (req, res) => {
 
 export const getHome = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [
-      req.userId,
-    ]);
+    const [rows] = await pool.query(
+      "SELECT id, name, email, avatar_url FROM users WHERE id = ?",
+      [req.userId]
+    );
     if (rows.length === 0) {
       return res.status(404).json({ message: "user do not exist" });
     }

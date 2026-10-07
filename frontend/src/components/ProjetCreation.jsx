@@ -60,7 +60,6 @@ const ProjetCreation = () => {
               </label>
               <textarea
                 {...register("description")}
-                required
                 placeholder="Description"
                 maxLength={350}
                 value={description}
@@ -81,7 +80,6 @@ const ProjetCreation = () => {
               {isSubmitting ? "Création..." : "Créer le projet"}
             </button>
           </form>
-          <label className="modal-backdrop" htmlFor="projet-modal">Close</label>
         </div>
         <label className="modal-backdrop" htmlFor="projet-modal">Close</label>
       </div>

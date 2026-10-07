@@ -25,7 +25,7 @@ const Navbar = () => {
             <li className="menu-title border-b-1 border-gray-200">User</li>
             <li><a>Menu</a></li>
             <li><a>Settings</a></li>
-            <li><NavLink to="/login">Log out</NavLink></li>
+            <li><NavLink to="/login" onClick={() => localStorage.removeItem("token")}>Log out</NavLink></li>
           </ul>
         </div>
       </div>

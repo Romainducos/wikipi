@@ -24,7 +24,8 @@ const LoginForm = () => {
         navigate('/')
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Login error:", error);
+      alert(error.response?.data?.message || "Erreur lors de la connexion");
     }
   };
 

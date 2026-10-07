@@ -6,9 +6,15 @@ export const validateDocumentation = (req, res, next) => {
     });
   }
 
-  if (content && content.length > 350) {
+  if (!content || content.trim().length === 0) {
     return res.status(400).json({
-      message: "Content trop long (max 350 caractères)",
+      message: "Le contenu est requis",
+    });
+  }
+
+  if (content.length > 10000) {
+    return res.status(400).json({
+      message: "Content trop long (max 10000 caractères)",
     });
   }
   if (excerpt && excerpt.length > 50) {
