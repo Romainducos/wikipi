@@ -7,6 +7,7 @@ import Admin from './routes/Admin';
 import Settings from './routes/Settings'
 import DocumentEdit from './routes/DocumentEdit'
 import Proposals from './routes/Proposals'
+import Group from './routes/Group'
 import { AuthProvider } from './contexts/AuthProvider'
 import { ProjectsProvider } from './contexts/ProjectProvider'
 import { DocumentationsProvider } from './contexts/DocumentationsProvider'
@@ -26,6 +27,7 @@ const App = () => {
               <Route path="/project/:projectId/documentation/:docId" element={<Project />} />
               <Route path="/project/:projectId/documentation/:docId/edit" element={<DocumentEdit />} />
               <Route path="/proposals" element={<Proposals />} />
+              <Route path="/group" element={<Group />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>
           </DocumentationsProvider>

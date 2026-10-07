@@ -66,22 +66,18 @@ export const login = async (req, res) => {
 export const getHome = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = ?",
+      `SELECT u.id, u.name, u.email, u.role, u.avatar_url, u.created_at,
+              gm.group_id, gm.role AS group_role, g.name AS group_name
+       FROM users u
+       LEFT JOIN group_members gm ON gm.user_id = u.id
+       LEFT JOIN user_groups g ON g.id = gm.group_id
+       WHERE u.id = ?`,
       [req.user.id]
     );
     if (rows.length === 0) {
       return res.status(404).json({ message: "user do not exist" });
     }
-    return res.status(200).json({
-      user: {
-        id: rows[0].id,
-        name: rows[0].name,
-        email: rows[0].email,
-        role: rows[0].role,
-        avatar_url: rows[0].avatar_url,
-        created_at: rows[0].created_at,
-      },
-    });
+    return res.status(200).json({ user: rows[0] });
   } catch (err) {
     return res.status(500).json({ message: "server error" });
   }

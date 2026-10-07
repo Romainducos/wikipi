@@ -11,8 +11,13 @@ export const verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_KEY);
 
+    // Utilisateur + son groupe (un seul possible) pour les règles d'accès
     const [rows] = await pool.query(
-      "SELECT id, name, email, role FROM users WHERE id = ?",
+      `SELECT u.id, u.name, u.email, u.role,
+              gm.group_id, gm.role AS group_role
+       FROM users u
+       LEFT JOIN group_members gm ON gm.user_id = u.id
+       WHERE u.id = ?`,
       [decoded.id]
     );
 

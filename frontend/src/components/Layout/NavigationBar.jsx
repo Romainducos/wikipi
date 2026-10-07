@@ -4,30 +4,42 @@ import { useEffect, useState } from "react"
 import { NavLink, useLocation } from "react-router-dom"
 import { useAuth } from '../../hooks/useAuth'
 import { api, assetUrl } from '../../api'
-import { subscribe, PROPOSALS_CHANGED } from '../../events'
+import { subscribe, PROPOSALS_CHANGED, GROUPS_CHANGED } from '../../events'
 
-// Nombre de propositions que l'utilisateur doit relire
-const useProposalsToReviewCount = (enabled) => {
-  const [count, setCount] = useState(0)
+// Compteurs de la navbar : propositions à relire et invitations reçues
+const useNotificationCounts = (enabled) => {
+  const [counts, setCounts] = useState({ proposals: 0, invitations: 0 })
   const { pathname } = useLocation()
 
   useEffect(() => {
     if (!enabled) return
     const refresh = () => {
-      api.get('/api/proposals/to-review/count')
-        .then((res) => setCount(res.data.count))
+      Promise.all([
+        api.get('/api/proposals/to-review/count'),
+        api.get('/api/groups/me/invitations/count'),
+      ])
+        .then(([proposals, invitations]) => setCounts({
+          proposals: proposals.data.count,
+          invitations: invitations.data.count,
+        }))
         .catch(() => {})
     }
     refresh()
-    return subscribe(PROPOSALS_CHANGED, refresh)
+    const unsubscribeProposals = subscribe(PROPOSALS_CHANGED, refresh)
+    const unsubscribeGroups = subscribe(GROUPS_CHANGED, refresh)
+    return () => {
+      unsubscribeProposals()
+      unsubscribeGroups()
+    }
   }, [enabled, pathname])
 
-  return count
+  return counts
 }
 
 const Navbar = () => {
   const { user: authUser, logout } = useAuth()
-  const proposalsCount = useProposalsToReviewCount(!!authUser)
+  const { proposals: proposalsCount, invitations: invitationsCount } = useNotificationCounts(!!authUser)
+  const totalCount = proposalsCount + invitationsCount
 
   return (
     <div className="navbar fixed top-0 left-0 w-full z-50 bg-base-100 px-6 py-4 flex justify-between border-b-1 border-base-300">
@@ -45,9 +57,9 @@ const Navbar = () => {
       </div>
       <div className="flex items-center"> {/* Right side of the navbar (user avatar with dropdown menu) */}
         <div className="dropdown dropdown-end indicator">
-          {proposalsCount > 0 && (
-            <span className="indicator-item badge badge-primary badge-sm" aria-label={`${proposalsCount} proposition(s) à relire`}>
-              {proposalsCount}
+          {totalCount > 0 && (
+            <span className="indicator-item badge badge-primary badge-sm" aria-label={`${totalCount} notification(s)`}>
+              {totalCount}
             </span>
           )}
           <div tabIndex={0} role="button" className="avatar w-[42px] rounded-full m-1"><img src={assetUrl(authUser?.user.avatar_url) || user} alt="User Avatar" className="object-cover rounded-full" /></div> {/* User avatar */}
@@ -58,6 +70,12 @@ const Navbar = () => {
             {authUser?.user.role === 'admin' && (
               <li><NavLink to="/admin">Tableau de bord Admin</NavLink></li>
             )}
+            <li>
+              <NavLink to="/group">
+                {authUser?.user.group_name ? `Groupe ${authUser.user.group_name}` : 'Mon groupe'}
+                {invitationsCount > 0 && <span className="badge badge-primary badge-sm">{invitationsCount}</span>}
+              </NavLink>
+            </li>
             <li>
               <NavLink to="/proposals">
                 Propositions

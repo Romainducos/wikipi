@@ -17,7 +17,7 @@ const PROPOSAL_SELECT = `
          d.title AS current_title, d.excerpt AS current_excerpt,
          d.content AS current_content, d.updated_at AS documentation_updated_at,
          d.created_by AS documentation_created_by,
-         p.id AS project_id, p.title AS project_title
+         p.id AS project_id, p.title AS project_title, p.group_id AS project_group_id
   FROM documentation_proposals pr
   JOIN documentations d ON pr.documentation_id = d.id
   JOIN projects p ON d.project_id = p.id

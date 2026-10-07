@@ -3,11 +3,14 @@ import { useForm } from "react-hook-form"
 import { useProjectsContext } from '../../hooks/useProjectsContext'
 import { subscribe, OPEN_PROJECT_MODAL } from '../../events'
 import { focusAfterOpen } from '../../focusAfterOpen'
+import VisibilityField from './VisibilityField'
 
 const ProjectCreationModal = () => {
   const dialogRef = useRef(null)
   const [submitError, setSubmitError] = useState(null)
-  const { register, handleSubmit, watch, reset, setFocus, formState: { errors, isSubmitting } } = useForm()
+  const { register, handleSubmit, watch, reset, setFocus, formState: { errors, isSubmitting } } = useForm({
+    defaultValues: { title: "", description: "", visibility: "private" },
+  })
   const description = watch("description") || ""
 
   const { createProject } = useProjectsContext()
@@ -30,7 +33,7 @@ const ProjectCreationModal = () => {
       await createProject({
         title: data.title.trim(),
         description: data.description?.trim() || null,
-        is_public: data.is_public
+        visibility: data.visibility
       })
       dialogRef.current?.close()
     } catch (error) {
@@ -79,10 +82,7 @@ const ProjectCreationModal = () => {
             </p>
           </fieldset>
 
-          <label className="label cursor-pointer gap-3">
-            <input type="checkbox" {...register("is_public")} className="toggle toggle-primary" />
-            <span>Projet public : visible par tous les utilisateurs</span>
-          </label>
+          <VisibilityField register={register} />
 
           {submitError && (
             <div role="alert" className="alert alert-error alert-soft">{submitError}</div>

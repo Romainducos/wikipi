@@ -5,6 +5,7 @@ import projectRouter from "./routes/projectRoutes.js";
 import documentationRoutes from "./routes/documentationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import proposalRoutes from "./routes/proposalRoutes.js";
+import groupRoutes from "./routes/groupRoutes.js";
 import { UPLOADS_DIR } from "./lib/uploads.js";
 
 const requiredEnv = [
@@ -24,12 +25,18 @@ if (missingEnv.length > 0) {
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
 app.use(express.json());
+// Express 5 laisse req.body undefined sans corps de requête : on garantit un objet
+app.use((req, res, next) => {
+  req.body ??= {};
+  next();
+});
 app.use("/uploads", express.static(UPLOADS_DIR));
 app.use("/auth", authRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/documentations", documentationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/proposals", proposalRoutes);
+app.use("/api/groups", groupRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running");

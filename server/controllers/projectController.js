@@ -5,9 +5,10 @@ import { visibleProjectsCondition, canManageProject } from "../lib/access.js";
 const findVisibleProject = async (user, projectId) => {
   const visible = visibleProjectsCondition(user);
   const [rows] = await pool.query(
-    `SELECT p.*, u.name as creator_name
+    `SELECT p.*, u.name as creator_name, g.name as group_name
      FROM projects p
      JOIN users u ON p.created_by = u.id
+     LEFT JOIN user_groups g ON p.group_id = g.id
      WHERE p.id = ? AND ${visible.sql}`,
     [projectId, ...visible.params]
   );
@@ -18,6 +19,17 @@ const withPermissions = (user, project) => ({
   ...project,
   permissions: { canManage: canManageProject(user, project) },
 });
+
+// Groupe à associer au projet selon sa visibilité, ou erreur si l'utilisateur
+// choisit « groupe » sans être dans un groupe
+const resolveGroupId = (user, visibility, currentGroupId = null) => {
+  if (visibility !== "group") return { groupId: null };
+  const groupId = currentGroupId || user.group_id;
+  if (!groupId) {
+    return { error: "Vous devez faire partie d'un groupe pour partager un projet avec lui" };
+  }
+  return { groupId };
+};
 
 const handleWriteError = (error, res, defaultMessage) => {
   if (error.code === "ER_DUP_ENTRY") {
@@ -42,12 +54,18 @@ const handleWriteError = (error, res, defaultMessage) => {
 };
 
 export const createProject = async (req, res) => {
-  const { title, description, is_public } = req.body;
+  const { title, description } = req.body;
+  const visibility = req.body.visibility || "private";
+
+  const { groupId, error } = resolveGroupId(req.user, visibility);
+  if (error) {
+    return res.status(400).json({ message: error });
+  }
 
   try {
     const [result] = await pool.query(
-      `INSERT INTO projects (title, description, created_by, is_public) VALUES (?, ?, ?, ?)`,
-      [title.trim(), description ? description.trim() : null, req.user.id, is_public ? 1 : 0]
+      `INSERT INTO projects (title, description, created_by, visibility, group_id) VALUES (?, ?, ?, ?, ?)`,
+      [title.trim(), description ? description.trim() : null, req.user.id, visibility, groupId]
     );
 
     const project = await findVisibleProject(req.user, result.insertId);
@@ -66,8 +84,10 @@ export const getProjects = async (req, res) => {
 
   try {
     const [projects] = await pool.query(
-      `SELECT p.id, p.title, p.description, p.created_by, p.is_public, p.created_at
+      `SELECT p.id, p.title, p.description, p.created_by, p.visibility, p.group_id,
+              g.name as group_name, p.created_at
       FROM projects p
+      LEFT JOIN user_groups g ON p.group_id = g.id
       WHERE ${visible.sql}
       ORDER BY p.created_at DESC`,
       visible.params
@@ -109,7 +129,8 @@ export const getProjectById = async (req, res) => {
 };
 
 export const updateProject = async (req, res) => {
-  const { title, description, is_public } = req.body;
+  const { title, description } = req.body;
+  const visibility = req.body.visibility || "private";
 
   try {
     const project = await findVisibleProject(req.user, req.params.id);
@@ -117,12 +138,17 @@ export const updateProject = async (req, res) => {
       return res.status(404).json({ message: "Projet non trouvé ou accès refusé" });
     }
     if (!canManageProject(req.user, project)) {
-      return res.status(403).json({ message: "Seul le créateur du projet peut le modifier" });
+      return res.status(403).json({ message: "Vous ne pouvez pas modifier ce projet" });
+    }
+
+    const { groupId, error } = resolveGroupId(req.user, visibility, project.group_id);
+    if (error) {
+      return res.status(400).json({ message: error });
     }
 
     await pool.query(
-      "UPDATE projects SET title = ?, description = ?, is_public = ? WHERE id = ?",
-      [title.trim(), description ? description.trim() : null, is_public ? 1 : 0, project.id]
+      "UPDATE projects SET title = ?, description = ?, visibility = ?, group_id = ? WHERE id = ?",
+      [title.trim(), description ? description.trim() : null, visibility, groupId, project.id]
     );
 
     const updated = await findVisibleProject(req.user, project.id);
@@ -145,7 +171,7 @@ export const deleteProject = async (req, res) => {
       return res.status(404).json({ message: "Projet non trouvé ou accès refusé" });
     }
     if (!canManageProject(req.user, project)) {
-      return res.status(403).json({ message: "Seul le créateur du projet peut le supprimer" });
+      return res.status(403).json({ message: "Vous ne pouvez pas supprimer ce projet" });
     }
 
     // Les documentations du projet sont supprimées avec lui

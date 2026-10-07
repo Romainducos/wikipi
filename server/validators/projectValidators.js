@@ -7,6 +7,13 @@ export const validateProject = (req, res, next) => {
     });
   }
 
+  const { visibility } = req.body;
+  if (visibility !== undefined && !["public", "group", "private"].includes(visibility)) {
+    return res.status(400).json({
+      message: "Visibilité invalide (public, group ou private)",
+    });
+  }
+
   if (description && description.length > 350) {
     return res.status(400).json({
       message: "Description trop longue (max 350 caractères)",

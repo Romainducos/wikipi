@@ -4,6 +4,9 @@ import { useDocumentationsContext } from "../../hooks/useDocumentationsContext"
 import { useProjectsContext } from "../../hooks/useProjectsContext"
 import ProjectEditModal from "./ProjectEditModal"
 import ConfirmDialog from "../Shared/ConfirmDialog"
+import { VISIBILITY_LABELS } from "./visibility"
+
+const VISIBILITY_BADGES = { public: "badge-success badge-soft", group: "badge-info badge-soft", private: "badge-outline" }
 
 // Page d'accueil d'un projet : infos, documentations, gestion
 const ProjectOverview = ({ project, onProjectChanged }) => {
@@ -55,8 +58,8 @@ const ProjectOverview = ({ project, onProjectChanged }) => {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold">{project.title}</h1>
-            <span className={`badge ${project.is_public ? "badge-success" : "badge-neutral"} badge-soft`}>
-              {project.is_public ? "Public" : "Privé"}
+            <span className={`badge ${VISIBILITY_BADGES[project.visibility]}`}>
+              {project.visibility === "group" ? `Groupe ${project.group_name}` : VISIBILITY_LABELS[project.visibility]}
             </span>
           </div>
           <p className="text-sm text-base-content/70 mt-1">

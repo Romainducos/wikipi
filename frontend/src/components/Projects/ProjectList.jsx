@@ -1,6 +1,19 @@
 import ProjectListItem from './ProjectListItem'
+import { useAuth } from '../../hooks/useAuth'
+
+// Section de la sidebar où ranger un projet
+const sectionOf = (project, user) => {
+  if (project.visibility === 'group') {
+    return project.group_id === user?.group_id ? 'group' : 'other'
+  }
+  if (project.visibility === 'public') return 'public'
+  return project.created_by === user?.id ? 'mine' : 'other'
+}
 
 const ProjectList = ({ projects, loading, error, searchTerm }) => {
+  const { user: authUser } = useAuth()
+  const currentUser = authUser?.user
+
   const filteredProjects = searchTerm
     ? projects.filter(project =>
       project.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -31,14 +44,25 @@ const ProjectList = ({ projects, loading, error, searchTerm }) => {
     )
   }
 
+  const sections = [
+    { key: 'group', title: currentUser?.group_name ? `Groupe ${currentUser.group_name}` : 'Mon groupe' },
+    { key: 'mine', title: 'Mes projets privés' },
+    { key: 'public', title: 'Publics' },
+    { key: 'other', title: 'Autres projets' },
+  ]
+
   return (
     <>
-      {filteredProjects.map(project => (
-        <ProjectListItem
-          key={project.id}
-          project={project}
-        />
-      ))}
+      {sections.map(({ key, title }) => {
+        const sectionProjects = filteredProjects.filter(p => sectionOf(p, currentUser) === key)
+        if (sectionProjects.length === 0) return null
+        return [
+          <li key={`title-${key}`} className="menu-title mt-2">{title}</li>,
+          ...sectionProjects.map(project => (
+            <ProjectListItem key={project.id} project={project} />
+          )),
+        ]
+      })}
     </>
   )
 }

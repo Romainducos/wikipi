@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useProjectsContext } from '../../hooks/useProjectsContext'
 import { focusAfterOpen } from '../../focusAfterOpen'
+import VisibilityField from './VisibilityField'
 
 // Modification d'un projet existant (titre, description, visibilité)
 const ProjectEditModal = ({ project, open, onClose, onSaved }) => {
@@ -17,7 +18,7 @@ const ProjectEditModal = ({ project, open, onClose, onSaved }) => {
       reset({
         title: project.title,
         description: project.description || "",
-        is_public: !!project.is_public,
+        visibility: project.visibility,
       })
       setSubmitError(null)
       dialog.showModal()
@@ -32,7 +33,7 @@ const ProjectEditModal = ({ project, open, onClose, onSaved }) => {
       const updated = await updateProject(project.id, {
         title: data.title.trim(),
         description: data.description.trim() || null,
-        is_public: data.is_public,
+        visibility: data.visibility,
       })
       onSaved(updated)
       onClose()
@@ -69,10 +70,7 @@ const ProjectEditModal = ({ project, open, onClose, onSaved }) => {
             <p className="label justify-end">{description.length}/350 caractères</p>
           </fieldset>
 
-          <label className="label cursor-pointer gap-3">
-            <input type="checkbox" {...register("is_public")} className="toggle toggle-primary" />
-            <span>Projet public : visible par tous les utilisateurs</span>
-          </label>
+          <VisibilityField register={register} currentGroupName={project.group_name} />
 
           {submitError && (
             <div role="alert" className="alert alert-error alert-soft">{submitError}</div>

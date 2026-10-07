@@ -9,7 +9,7 @@ import {
 const findVisibleProject = async (user, projectId) => {
   const visible = visibleProjectsCondition(user);
   const [rows] = await pool.query(
-    `SELECT p.id, p.created_by, p.is_public FROM projects p WHERE p.id = ? AND ${visible.sql}`,
+    `SELECT p.id, p.created_by, p.visibility, p.group_id FROM projects p WHERE p.id = ? AND ${visible.sql}`,
     [projectId, ...visible.params]
   );
   return rows[0];
@@ -23,6 +23,7 @@ export const findVisibleDocumentation = async (user, docId) => {
             p.title as project_title,
             p.description as project_description,
             p.created_by as project_created_by,
+            p.group_id as project_group_id,
             u.name as author_name,
             u.avatar_url as author_avatar
      FROM documentations d
@@ -35,7 +36,7 @@ export const findVisibleDocumentation = async (user, docId) => {
 };
 
 const withPermissions = (user, documentation) => {
-  const project = { created_by: documentation.project_created_by };
+  const project = { created_by: documentation.project_created_by, group_id: documentation.project_group_id };
   return {
     ...documentation,
     permissions: {
@@ -200,7 +201,7 @@ export const deleteDocumentation = async (req, res) => {
       return res.status(404).json({ message: "Documentation non trouvée ou accès refusé" });
     }
 
-    const project = { created_by: documentation.project_created_by };
+    const project = { created_by: documentation.project_created_by, group_id: documentation.project_group_id };
     if (!canDeleteDocumentation(req.user, documentation, project)) {
       return res.status(403).json({ message: "Vous ne pouvez pas supprimer cette documentation" });
     }
