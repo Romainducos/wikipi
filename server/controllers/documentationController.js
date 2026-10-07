@@ -212,3 +212,35 @@ export const deleteDocumentation = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la suppression de la documentation" });
   }
 };
+
+export const updateDocumentation = async (req, res) => {
+  const { title, excerpt, content } = req.body;
+
+  try {
+    const documentation = await findVisibleDocumentation(req.user, req.params.id);
+    if (!documentation) {
+      return res.status(404).json({ message: "Documentation non trouvée ou accès refusé" });
+    }
+    if (!canEditDocumentation(req.user, documentation)) {
+      return res.status(403).json({
+        message: "Vous ne pouvez pas modifier cette documentation directement : proposez une modification",
+      });
+    }
+
+    await pool.query(
+      `UPDATE documentations
+       SET title = ?, excerpt = ?, content = ?, last_modified_by = ?
+       WHERE id = ?`,
+      [title.trim(), excerpt?.trim() || null, content, req.user.id, documentation.id]
+    );
+
+    const updated = await findVisibleDocumentation(req.user, documentation.id);
+    res.status(200).json({
+      message: "Documentation mise à jour",
+      documentation: withPermissions(req.user, updated),
+    });
+  } catch (error) {
+    console.error("Erreur mise à jour documentation:", error);
+    res.status(500).json({ message: "Erreur lors de la mise à jour de la documentation" });
+  }
+};

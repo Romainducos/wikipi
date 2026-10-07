@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { useDocumentationsContext } from "../../hooks/useDocumentationsContext";
 import ConfirmDialog from "../Shared/ConfirmDialog";
 
 const DocumentPage = ({ project, documentation }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const flash = location.state?.flash;
   const { deleteDocumentation } = useDocumentationsContext();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -29,6 +31,10 @@ const DocumentPage = ({ project, documentation }) => {
     <div>
       <main className="p-6 mt-30 mx-5 border-1 border-dashed border-base-300 rounded">
 
+        {flash && (
+          <div role="status" className="alert alert-success alert-soft mb-4">{flash}</div>
+        )}
+
         <div className="breadcrumbs text-sm mb-2">
           <ul>
             <li><NavLink to={`/project/${project.id}`}>{project.title}</NavLink></li>
@@ -46,9 +52,15 @@ const DocumentPage = ({ project, documentation }) => {
 
           {documentation && (
             <div className="flex gap-2">
-              <button type="button" className="btn btn-link">
-                Soumettre une modification
-              </button>
+              {permissions.canEdit ? (
+                <NavLink to="edit" relative="path" className="btn btn-sm btn-primary">
+                  Modifier
+                </NavLink>
+              ) : (
+                <NavLink to="edit" relative="path" className="btn btn-sm btn-primary btn-outline">
+                  Proposer une modification
+                </NavLink>
+              )}
               {permissions.canDelete && (
                 <button type="button" className="btn btn-sm btn-error btn-outline" onClick={() => setDeleteOpen(true)}>
                   Supprimer

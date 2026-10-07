@@ -27,3 +27,16 @@ export const canEditDocumentation = (user, documentation) =>
 // Supprimer une documentation : ceux qui peuvent la modifier + le créateur du projet
 export const canDeleteDocumentation = (user, documentation, project) =>
   canEditDocumentation(user, documentation) || canManageProject(user, project);
+
+// Valider / refuser une proposition : ceux qui peuvent modifier la doc
+export const canReviewProposal = (user, documentation) =>
+  canEditDocumentation(user, documentation);
+
+// Condition SQL des propositions que l'utilisateur peut traiter.
+// `docAlias` = alias de la table documentations dans la requête.
+export const reviewableProposalsCondition = (user, docAlias = "d") => {
+  if (isAdmin(user) || isModerator(user)) {
+    return { sql: "1 = 1", params: [] };
+  }
+  return { sql: `${docAlias}.created_by = ?`, params: [user.id] };
+};

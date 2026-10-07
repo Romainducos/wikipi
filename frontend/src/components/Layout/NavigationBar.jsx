@@ -1,11 +1,33 @@
 import logoWikipi from '../../assets/Logo_wikiPi.png'
 import user from '../../assets/default-user-icon.webp'
-import { NavLink } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { NavLink, useLocation } from "react-router-dom"
 import { useAuth } from '../../hooks/useAuth'
-import { assetUrl } from '../../api'
+import { api, assetUrl } from '../../api'
+import { subscribe, PROPOSALS_CHANGED } from '../../events'
+
+// Nombre de propositions que l'utilisateur doit relire
+const useProposalsToReviewCount = (enabled) => {
+  const [count, setCount] = useState(0)
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    if (!enabled) return
+    const refresh = () => {
+      api.get('/api/proposals/to-review/count')
+        .then((res) => setCount(res.data.count))
+        .catch(() => {})
+    }
+    refresh()
+    return subscribe(PROPOSALS_CHANGED, refresh)
+  }, [enabled, pathname])
+
+  return count
+}
 
 const Navbar = () => {
   const { user: authUser, logout } = useAuth()
+  const proposalsCount = useProposalsToReviewCount(!!authUser)
 
   return (
     <div className="navbar fixed top-0 left-0 w-full z-50 bg-base-100 px-6 py-4 flex justify-between border-b-1 border-base-300">
@@ -22,8 +44,13 @@ const Navbar = () => {
         </div>
       </div>
       <div className="flex items-center"> {/* Right side of the navbar (user avatar with dropdown menu) */}
-        <div className="avatar dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="w-[42px] rounded-full m-1"><img src={assetUrl(authUser?.user.avatar_url) || user} alt="User Avatar" className="object-cover" /></div> {/* User avatar */}
+        <div className="dropdown dropdown-end indicator">
+          {proposalsCount > 0 && (
+            <span className="indicator-item badge badge-primary badge-sm" aria-label={`${proposalsCount} proposition(s) à relire`}>
+              {proposalsCount}
+            </span>
+          )}
+          <div tabIndex={0} role="button" className="avatar w-[42px] rounded-full m-1"><img src={assetUrl(authUser?.user.avatar_url) || user} alt="User Avatar" className="object-cover rounded-full" /></div> {/* User avatar */}
           <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 mt-12 shadow-lg"> {/* Dropdown menu */}
             <li className="menu-title border-b-1 border-base-300">
               {authUser?.user.name || 'User'}
@@ -31,6 +58,12 @@ const Navbar = () => {
             {authUser?.user.role === 'admin' && (
               <li><NavLink to="/admin">Tableau de bord Admin</NavLink></li>
             )}
+            <li>
+              <NavLink to="/proposals">
+                Propositions
+                {proposalsCount > 0 && <span className="badge badge-primary badge-sm">{proposalsCount}</span>}
+              </NavLink>
+            </li>
             <li><NavLink to="/settings">Settings</NavLink></li>
             <li ><button onClick={logout}>Log out</button></li>
           </ul>

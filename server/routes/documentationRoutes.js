@@ -5,7 +5,9 @@ import {
   getAllDocumentations,
   getDocumentationById,
   deleteDocumentation,
+  updateDocumentation,
 } from "../controllers/documentationController.js";
+import { createProposal } from "../controllers/proposalController.js";
 import { verifyToken } from "../middleware/auth.js";
 import { validateIdParam } from "../middleware/validates.js";
 import { validateDocumentation } from "../validators/documentationValidator.js";
@@ -27,6 +29,8 @@ router.get("/projects/:projectId/documentations", getDocumentationsByProject);
 router.get("/", getAllDocumentations);
 
 router.get("/:id", getDocumentationById);
+router.put("/:id", validateDocumentation, updateDocumentation);
 router.delete("/:id", deleteDocumentation);
+router.post("/:id/proposals", validateDocumentation, createProposal);
 
 export default router;

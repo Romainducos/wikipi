@@ -107,10 +107,10 @@ export const useDocumentations = () => {
       setLoadingAction(true);
 
       try {
-        await api.put(`/api/documentations/${docId}`, docData);
+        const response = await api.put(`/api/documentations/${docId}`, docData);
         setDocsVersion((v) => v + 1);
         loadDocumentations().catch(() => {});
-        loadDocumentation(docId).catch(() => {});
+        return response.data.documentation;
       } catch (err) {
         console.error(`Erreur lors de la modification de la documentation ${docId}`, err);
         throw err;
@@ -118,7 +118,7 @@ export const useDocumentations = () => {
         setLoadingAction(false);
       }
     },
-    [loadDocumentations, loadDocumentation]
+    [loadDocumentations]
   );
 
   const deleteDocumentation = useCallback(
@@ -138,6 +138,12 @@ export const useDocumentations = () => {
     },
     [loadDocumentations]
   );
+
+  // À appeler quand une doc change par un autre chemin (ex. proposition acceptée)
+  const notifyDocumentationsChanged = useCallback(() => {
+    setDocsVersion((v) => v + 1);
+    loadDocumentations().catch(() => {});
+  }, [loadDocumentations]);
 
   const resetError = useCallback(() => {
     setError(null);
@@ -161,5 +167,6 @@ export const useDocumentations = () => {
     updateDocumentation,
     deleteDocumentation,
     resetError,
+    notifyDocumentationsChanged,
   };
 };

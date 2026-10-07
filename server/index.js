@@ -4,6 +4,7 @@ import authRouter from "./routes/authRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
 import documentationRoutes from "./routes/documentationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import proposalRoutes from "./routes/proposalRoutes.js";
 import { UPLOADS_DIR } from "./lib/uploads.js";
 
 const requiredEnv = [
@@ -28,6 +29,7 @@ app.use("/auth", authRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/documentations", documentationRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/proposals", proposalRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running");
