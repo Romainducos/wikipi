@@ -79,7 +79,7 @@ const ProjetCreation = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-md mt-2 transition-colors">
+              className="bg-red-primary hover:bg-red-secondary text-white font-medium py-2.5 rounded-md mt-2 transition-colors">
               {isSubmitting ? "Création..." : "Créer le projet"}
             </button>
           </form>

@@ -200,7 +200,7 @@ const DocumentCreation = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || !selectedProjectId}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-md transition-colors"
+                className="flex-1 bg-red-primary hover:bg-red-secondary text-white font-medium py-2.5 rounded-md transition-colors"
               >
                 {isSubmitting ? "Création..." : "Créer la documentation"}
               </button>

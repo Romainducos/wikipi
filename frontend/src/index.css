@@ -1,6 +1,45 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
+  themes: light --default;
+}
+
+/* Thème sombre WikiPi : anthracite neutre + rouge de la marque */
+@plugin "daisyui/theme" {
+  name: "wikipi-dark";
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #1C1C1F;
+  --color-base-200: #141416;
+  --color-base-300: #2E2E33;
+  --color-base-content: #EDEDEF;
+
+  --color-primary: #E5484D;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #3A3A40;
+  --color-secondary-content: #EDEDEF;
+  --color-accent: #F2A7A9;
+  --color-accent-content: #1C1C1F;
+  --color-neutral: #26262A;
+  --color-neutral-content: #EDEDEF;
+
+  --color-info: #6CB4F5;
+  --color-info-content: #0B1A26;
+  --color-success: #5BD18B;
+  --color-success-content: #0A2014;
+  --color-warning: #F2C35B;
+  --color-warning-content: #2A1E05;
+  --color-error: #FF7A7F;
+  --color-error-content: #2A0A0B;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.75rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
 @theme{
@@ -13,19 +52,25 @@
   --color-text-link: #3B82F6;
 }
 
-/* Couleurs de texte lisibles sur le thème sombre de daisyUI */
+/* Valeurs des tokens WikiPi en thème sombre */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-text-primary: #E5E7EB;
-    --color-text-secondary: #9CA3AF;
-    --color-text-terciary: #6B7280;
-    --color-text-link: #60A5FA;
+    --color-red-primary: #E5484D;
+    --color-red-secondary: #8E1F24;
+    --color-red-terciary: #6B171B;
+    --color-text-primary: #EDEDEF;
+    --color-text-secondary: #A0A0A8;
+    --color-text-terciary: #6E6E76;
+    --color-text-link: #7DB4FF;
   }
 }
 
-:root[data-theme="dark"] {
-  --color-text-primary: #E5E7EB;
-  --color-text-secondary: #9CA3AF;
-  --color-text-terciary: #6B7280;
-  --color-text-link: #60A5FA;
+:root[data-theme="wikipi-dark"] {
+  --color-red-primary: #E5484D;
+  --color-red-secondary: #8E1F24;
+  --color-red-terciary: #6B171B;
+  --color-text-primary: #EDEDEF;
+  --color-text-secondary: #A0A0A8;
+  --color-text-terciary: #6E6E76;
+  --color-text-link: #7DB4FF;
 }
