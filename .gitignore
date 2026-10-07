@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .env
+
+# Fichiers envoyés par les utilisateurs (avatars...)
+server/uploads/

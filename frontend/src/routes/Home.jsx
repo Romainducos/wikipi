@@ -1,8 +1,6 @@
 import AppLayout from "../components/Layout/AppLayout"
 import WelcomeHero from "../components/Layout/WelcomeHero"
 import DocumentListSection from "../components/Documents/DocumentListSection"
-import DocumentCreationModal from "../components/Documents/DocumentCreationModal"
-import ProjectCreationModal from "../components/Projects/ProjectCreationModal"
 import { useAuthProtection } from "../hooks/useAuthProtection"
 
 const Home = () => {
@@ -23,8 +21,6 @@ const Home = () => {
           <WelcomeHero />
           <DocumentListSection />
         </div>
-        <DocumentCreationModal />
-        <ProjectCreationModal />
       </main>
     </AppLayout>
   )

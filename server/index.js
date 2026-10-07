@@ -4,6 +4,7 @@ import authRouter from "./routes/authRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
 import documentationRoutes from "./routes/documentationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import { UPLOADS_DIR } from "./lib/uploads.js";
 
 const requiredEnv = [
   "PORT",
@@ -22,6 +23,7 @@ if (missingEnv.length > 0) {
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
 app.use(express.json());
+app.use("/uploads", express.static(UPLOADS_DIR));
 app.use("/auth", authRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/documentations", documentationRoutes);

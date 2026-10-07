@@ -33,3 +33,10 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// URL complète d'un fichier servi par le serveur (ex. avatar "/uploads/...")
+export const assetUrl = (path) => {
+  if (!path) return null;
+  if (/^https?:\/\//.test(path)) return path;
+  return `${api.defaults.baseURL}${path}`;
+};

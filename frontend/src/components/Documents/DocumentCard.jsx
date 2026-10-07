@@ -1,5 +1,6 @@
 import user from '../../assets/default-user-icon.webp';
 import { NavLink } from 'react-router-dom';
+import { assetUrl } from '../../api';
 
 const DocumentCard = ({ documentation }) => {
     // Tronquer le texte pour l'affichage
@@ -43,7 +44,7 @@ const DocumentCard = ({ documentation }) => {
                         <div className="avatar">
                             <div className="w-10 h-10 rounded-full">
                                 <img
-                                    src={author_avatar || user}
+                                    src={assetUrl(author_avatar) || user}
                                     alt={author_name}
                                     className="rounded-full"
                                 />

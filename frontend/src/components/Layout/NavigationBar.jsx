@@ -2,6 +2,7 @@ import logoWikipi from '../../assets/Logo_wikiPi.png'
 import user from '../../assets/default-user-icon.webp'
 import { NavLink } from "react-router-dom"
 import { useAuth } from '../../hooks/useAuth'
+import { assetUrl } from '../../api'
 
 const Navbar = () => {
   const { user: authUser, logout } = useAuth()
@@ -22,7 +23,7 @@ const Navbar = () => {
       </div>
       <div className="flex items-center"> {/* Right side of the navbar (user avatar with dropdown menu) */}
         <div className="avatar dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="w-[42px] rounded-full m-1"><img src={user} alt="User Avatar" /></div> {/* User avatar */}
+          <div tabIndex={0} role="button" className="w-[42px] rounded-full m-1"><img src={assetUrl(authUser?.user.avatar_url) || user} alt="User Avatar" className="object-cover" /></div> {/* User avatar */}
           <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 mt-12 shadow-lg"> {/* Dropdown menu */}
             <li className="menu-title border-b-1 border-base-300">
               {authUser?.user.name || 'User'}

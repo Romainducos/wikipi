@@ -1,4 +1,120 @@
+import bcrypt from "bcrypt";
 import { pool } from "../lib/db.js";
+import { removeUpload } from "../lib/uploads.js";
+
+const PROFILE_FIELDS = "id, name, email, role, avatar_url, created_at";
+
+const getProfile = async (userId) => {
+  const [rows] = await pool.query(
+    `SELECT ${PROFILE_FIELDS} FROM users WHERE id = ?`,
+    [userId]
+  );
+  return rows[0];
+};
+
+export const getMe = async (req, res) => {
+  try {
+    res.status(200).json({ user: await getProfile(req.user.id) });
+  } catch (error) {
+    console.error("Erreur récupération profil:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+export const updateMe = async (req, res) => {
+  const { name, email } = req.body;
+
+  try {
+    const [existing] = await pool.query(
+      "SELECT id FROM users WHERE email = ? AND id <> ?",
+      [email, req.user.id]
+    );
+    if (existing.length > 0) {
+      return res.status(409).json({ message: "Cet email est déjà utilisé" });
+    }
+
+    await pool.query("UPDATE users SET name = ?, email = ? WHERE id = ?", [
+      name,
+      email,
+      req.user.id,
+    ]);
+
+    res.status(200).json({
+      message: "Profil mis à jour",
+      user: await getProfile(req.user.id),
+    });
+  } catch (error) {
+    console.error("Erreur mise à jour profil:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+export const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const [rows] = await pool.query("SELECT password FROM users WHERE id = ?", [
+      req.user.id,
+    ]);
+    const isMatch = await bcrypt.compare(currentPassword, rows[0].password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Le mot de passe actuel est incorrect" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query("UPDATE users SET password = ? WHERE id = ?", [
+      hashedPassword,
+      req.user.id,
+    ]);
+
+    res.status(200).json({ message: "Mot de passe modifié" });
+  } catch (error) {
+    console.error("Erreur changement mot de passe:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+export const updateAvatar = async (req, res) => {
+  const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+  try {
+    const previous = await getProfile(req.user.id);
+    await pool.query("UPDATE users SET avatar_url = ? WHERE id = ?", [
+      avatarUrl,
+      req.user.id,
+    ]);
+    await removeUpload(previous.avatar_url);
+
+    res.status(200).json({
+      message: "Photo de profil mise à jour",
+      user: await getProfile(req.user.id),
+    });
+  } catch (error) {
+    console.error("Erreur mise à jour avatar:", error);
+    await removeUpload(avatarUrl);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
+export const deleteAvatar = async (req, res) => {
+  try {
+    const previous = await getProfile(req.user.id);
+    await pool.query("UPDATE users SET avatar_url = NULL WHERE id = ?", [
+      req.user.id,
+    ]);
+    await removeUpload(previous.avatar_url);
+
+    res.status(200).json({
+      message: "Photo de profil supprimée",
+      user: await getProfile(req.user.id),
+    });
+  } catch (error) {
+    console.error("Erreur suppression avatar:", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
 
 // fonction pour les admin uniquement
 export const getAllUsers = async (req, res) => {

@@ -2,8 +2,6 @@ import { useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import AppLayout from "../components/Layout/AppLayout"
 import DocumentPage from "../components/Documents/DocumentPage"
-import DocumentCreationModal from "../components/Documents/DocumentCreationModal"
-import ProjectCreationModal from "../components/Projects/ProjectCreationModal"
 import { useProjectsContext } from "../hooks/useProjectsContext"
 import { useDocumentationsContext } from "../hooks/useDocumentationsContext"
 import { useAuthProtection } from "../hooks/useAuthProtection"
@@ -112,8 +110,6 @@ const Project = () => {
     <AppLayout>
       <main>
         <DocumentPage project={project} documentation={currentDocumentation} />
-        <DocumentCreationModal />
-        <ProjectCreationModal />
       </main>
     </AppLayout>
   )

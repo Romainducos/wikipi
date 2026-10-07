@@ -3,8 +3,6 @@ import { useAuth } from '../hooks/useAuth';
 import { useAuthProtection } from '../hooks/useAuthProtection';
 import { api } from '../api';
 import AppLayout from "../components/Layout/AppLayout"
-import DocumentCreationModal from "../components/Documents/DocumentCreationModal"
-import ProjectCreationModal from "../components/Projects/ProjectCreationModal"
 import Dashboard from "../components/Layout/Dashboard"
 
 const Admin = () => {
@@ -62,8 +60,6 @@ const Admin = () => {
         <div className="border m-6 mt-26 rounded-xl border-dashed border-base-300 bg-base-100">
           <Dashboard data={users, stats} />
         </div>
-        <DocumentCreationModal />
-        <ProjectCreationModal />
       </main>
     </AppLayout>
   );
