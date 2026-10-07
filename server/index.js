@@ -8,6 +8,7 @@ import proposalRoutes from "./routes/proposalRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
 import moderatorRequestRoutes from "./routes/moderatorRequestRoutes.js";
 import { UPLOADS_DIR } from "./lib/uploads.js";
+import { frontendUrls } from "./lib/frontendUrls.js";
 
 const requiredEnv = [
   "PORT",
@@ -24,7 +25,7 @@ if (missingEnv.length > 0) {
 }
 
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
+app.use(cors({ origin: frontendUrls }));
 app.use(express.json());
 // Express 5 laisse req.body undefined sans corps de requête : on garantit un objet
 app.use((req, res, next) => {

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
 import { pool } from "../lib/db.js";
 import { sendMail } from "../lib/mailer.js";
+import { primaryFrontendUrl } from "../lib/frontendUrls.js";
 
 const RESET_TOKEN_TTL_MINUTES = 60;
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
@@ -119,8 +120,7 @@ export const forgotPassword = async (req, res) => {
       [user.id, hashToken(token), RESET_TOKEN_TTL_MINUTES]
     );
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    const link = `${frontendUrl}/reset-password?token=${token}`;
+    const link = `${primaryFrontendUrl}/reset-password?token=${token}`;
     await sendMail({
       to: user.email,
       subject: "WikiPi : réinitialisation de votre mot de passe",

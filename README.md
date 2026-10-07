@@ -321,7 +321,7 @@ Toutes les routes sauf l'inscription, la connexion et le mot de passe oublié de
 - **Authentification** : JWT avec expiration configurable
 - **Autorisation** : Middleware de vérification des rôles
 - **Validation** : express-validator pour les entrées utilisateur
-- **CORS** : limité à `FRONTEND_URL`
+- **CORS** : limité à `FRONTEND_URL` (plusieurs adresses possibles, séparées par des virgules)
 - **Limite de tentatives** : 10 par 15 min sur connexion, inscription et mot de passe oublié
 - **Réinitialisation** : seul le hash du jeton est stocké, lien à usage unique valable 1 h
 - **Uploads** : images JPG / PNG / WebP de 2 Mo max, servies sur `/uploads`
