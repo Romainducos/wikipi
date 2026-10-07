@@ -2,7 +2,7 @@ import { pool } from "../lib/db.js";
 
 export const getDocumentationsByProject = async (req, res) => {
   const projectId = req.params.projectId;
-  const userId = req.userId;
+  const userId = req.user.id;
 
   try {
     const [project] = await pool.query(
@@ -44,7 +44,7 @@ export const getDocumentationsByProject = async (req, res) => {
 
 export const createDocumentation = async (req, res) => {
   const projectId = req.params.projectId;
-  const userId = req.userId;
+  const userId = req.user.id;
   const { title, excerpt, content } = req.body;
 
   try {
@@ -118,7 +118,7 @@ export const createDocumentation = async (req, res) => {
 };
 
 export const getAllDocumentations = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user.id;
 
   try {
     const [documentations] = await pool.query(
@@ -161,7 +161,7 @@ export const getAllDocumentations = async (req, res) => {
 
 export const getDocumentationById = async (req, res) => {
   const { id } = req.params;
-  const userId = req.userId;
+  const userId = req.user.id;
 
   try {
     const [documentation] = await pool.query(

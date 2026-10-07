@@ -3,7 +3,7 @@ import { pool } from "../lib/db.js";
 export const createProject = async (req, res) => {
   const { title, description } = req.body;
 
-  const userId = req.userId;
+  const userId = req.user.id;
 
   try {
     const projectData = {
@@ -44,7 +44,7 @@ export const createProject = async (req, res) => {
 };
 
 export const getProjects = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user.id;
 
   try {
     const [projects] = await pool.query(
@@ -68,7 +68,7 @@ export const getProjects = async (req, res) => {
 
 export const getProjectById = async (req, res) => {
   const { id } = req.params;
-  const userId = req.userId;
+  const userId = req.user.id;
 
   try {
     const [project] = await pool.query(

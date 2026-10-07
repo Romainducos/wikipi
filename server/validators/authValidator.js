@@ -13,8 +13,7 @@ export const validateRegister = [
     .notEmpty()
     .withMessage("L'email est requis")
     .isEmail()
-    .withMessage("Format d'email invalide")
-    .normalizeEmail(),
+    .withMessage("Format d'email invalide"),
 
   body("password")
     .notEmpty()

@@ -1,5 +1,6 @@
 import express from "express";
 import { verifyToken } from "../middleware/auth.js";
+import { validateIdParam } from "../middleware/validates.js";
 import { isAdmin, isModeratorOrAdmin } from "../middleware/authorize.js";
 import {
   getAllUsers,
@@ -10,6 +11,7 @@ import {
 const router = express.Router();
 
 router.use(verifyToken);
+router.param("id", validateIdParam);
 
 router.get("/", isAdmin, getAllUsers);
 
