@@ -1,5 +1,6 @@
 import ActualityCard from "./ActualityCard.jsx";
 import { api } from '../api.js';
+import { subscribe, DOCUMENTATIONS_CHANGED } from '../events.js';
 import { useState, useEffect } from "react";
 
 const ActualitySection = () => {
@@ -24,6 +25,7 @@ const ActualitySection = () => {
 
   useEffect(() => {
     loadDocumentations();
+    return subscribe(DOCUMENTATIONS_CHANGED, loadDocumentations);
   }, []);
 
   if (loading) {

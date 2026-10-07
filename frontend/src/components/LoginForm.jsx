@@ -4,7 +4,7 @@ import logo from "../assets/Logo_wikiPi.png"
 import panda from "../assets/login_panda.png"
 import { NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios"
+import { api } from "../api.js"
 import { useState } from 'react'
 
 
@@ -17,9 +17,8 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:3000/auth/login", data);
-      console.log("Success:", response.data);
-      if (response.status === 201) {
+      const response = await api.post("/auth/login", data);
+      if (response.status === 200) {
         localStorage.setItem('token', response.data.token)
         navigate('/')
       }

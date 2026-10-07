@@ -3,6 +3,7 @@ import { MdAdd } from 'react-icons/md';
 import Loupe from "./Loupe.jsx";
 import SidebarProjet from "./SidebarProjet.jsx";
 import { api } from '../api.js';
+import { subscribe, PROJECTS_CHANGED } from '../events.js';
 
 const Sidebar = ({ children }) => {
   const [projects, setProjects] = useState([]);
@@ -29,6 +30,7 @@ const Sidebar = ({ children }) => {
 
   useEffect(() => {
     loadProjects();
+    return subscribe(PROJECTS_CHANGED, loadProjects);
   }, []);
 
   const handleFilter = (event) => {

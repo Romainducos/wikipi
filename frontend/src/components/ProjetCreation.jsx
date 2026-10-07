@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { api } from '../api.js';
+import { emit, PROJECTS_CHANGED } from '../events.js';
+
 const ProjetCreation = () => {
-  const [description, setDescription] = useState("");
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+  const modalCheckboxRef = useRef(null);
+  const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm();
+  const description = watch("description") || "";
 
   const onSubmit = async (data) => {
     try {
@@ -13,11 +16,13 @@ const ProjetCreation = () => {
       };
 
       const response = await api.post('/api/projects', projectData);
-      console.log("Projet créé:", response.data);
 
       if (response.status === 201) {
-        console.log("Projet créé avec succès");
-        window.location.reload();
+        reset();
+        if (modalCheckboxRef.current) {
+          modalCheckboxRef.current.checked = false;
+        }
+        emit(PROJECTS_CHANGED);
       }
 
     } catch (error) {
@@ -32,7 +37,7 @@ const ProjetCreation = () => {
 
   return (
     <div>
-      <input type="checkbox" id="projet-modal" className="modal-toggle" />
+      <input ref={modalCheckboxRef} type="checkbox" id="projet-modal" className="modal-toggle" />
       <div className="modal backdrop-blur-lg transition-all duration-100 ease-in-out" role="dialog">
         <div className="modal-box flex flex-col justify-center items-center bg-white rounded-2xl shadow-lg p-10 w-[420px]">
           <h2 className="text-3xl font-bold text-center mb-6">
@@ -62,8 +67,6 @@ const ProjetCreation = () => {
                 {...register("description")}
                 placeholder="Description"
                 maxLength={350}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
                 className="border border-gray-300 rounded-md px-3 py-2 text-sm h-24 resize-none"
               />
               {errors.description && (

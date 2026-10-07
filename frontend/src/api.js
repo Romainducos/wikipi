@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Configuration unique d'axios
 export const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
@@ -17,3 +17,19 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Token absent, invalide ou expiré : retour à la page de connexion
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isAuthRequest = error.config?.url?.startsWith("/auth/login") ||
+      error.config?.url?.startsWith("/auth/register");
+    if (error.response?.status === 401 && !isAuthRequest) {
+      localStorage.removeItem("token");
+      if (window.location.pathname.toLowerCase() !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);

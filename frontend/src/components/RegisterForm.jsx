@@ -3,7 +3,7 @@ import { FaRegEyeSlash } from "react-icons/fa";
 import logo from "../assets/Logo_wikiPi.png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { api } from "../api.js";
 import { useState } from 'react'
 
 const RegisterForm = () => {
@@ -21,16 +21,15 @@ const RegisterForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:3000/auth/register", data);
-      console.log("Success:", response.data);
+      const { name, email, password } = data;
+      const response = await api.post("/auth/register", { name, email, password });
       if (response.status === 201) {
         navigate('/login')
       }
     } catch (error) {
       console.error("Registration error:", error);
-      if (error.response?.data?.message) {
-        alert(error.response.data.message);
-      }
+      const responseData = error.response?.data;
+      alert(responseData?.errors?.[0]?.msg || responseData?.message || "Erreur lors de l'inscription");
     }
   };
 

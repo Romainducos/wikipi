@@ -2,15 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { useForm } from "react-hook-form";
+import { emit, subscribe, DOCUMENTATIONS_CHANGED, PROJECTS_CHANGED } from '../events.js';
 
 const DocumentCreation = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm({
+    defaultValues: { projectId: "", title: "", excerpt: "", content: "" },
+  });
 
   const modalCheckboxRef = useRef(null);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
-  const [content, setContent] = useState("");
+  const selectedProjectId = watch("projectId");
+  const content = watch("content") || "";
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -27,6 +30,7 @@ const DocumentCreation = () => {
       }
     };
     loadProjects();
+    return subscribe(PROJECTS_CHANGED, loadProjects);
   }, []);
 
   useEffect(() => {
@@ -35,43 +39,35 @@ const DocumentCreation = () => {
       modalCheckboxRef.current.checked = true;
       const projetExiste = projects.find(p => p.id.toString() === projetId);
       if (projetExiste) {
-        setSelectedProjectId(projetId);
+        setValue("projectId", projetId);
       }
     }
-  }, [searchParams, projects]);
+  }, [searchParams, projects, setValue]);
 
   const handleCloseModal = () => {
     navigate({ search: '' });
     if (modalCheckboxRef.current) {
       modalCheckboxRef.current.checked = false;
     }
-    setContent("");
-    setSelectedProjectId("");
+    reset();
   };
 
   const onSubmit = async (data) => {
-    // Valider qu'un projet est sélectionné
-    if (!selectedProjectId) {
-      alert("Veuillez sélectionner un projet");
-      return;
-    }
-
     try {
       const documentData = {
         title: data.title.trim(),
         excerpt: data.excerpt.trim() || null,
-        content: data.content.trim() || null,
+        content: data.content.trim(),
       };
 
       const response = await api.post(
-        `/api/documentations/projects/${selectedProjectId}/documentations`,
+        `/api/documentations/projects/${data.projectId}/documentations`,
         documentData
       );
 
       if (response.status === 201) {
-        console.log("Documentation créée avec succès");
         handleCloseModal();
-        window.location.reload();
+        emit(DOCUMENTATIONS_CHANGED);
       }
 
     } catch (error) {
@@ -111,8 +107,6 @@ const DocumentCreation = () => {
                   required: "Sélectionnez un projet",
                   validate: value => value !== "" || "Sélectionnez un projet"
                 })}
-                value={selectedProjectId}
-                onChange={(e) => setSelectedProjectId(e.target.value)}
                 className="select select-neutral validator"
                 disabled={loading}
               >
@@ -188,8 +182,6 @@ const DocumentCreation = () => {
                   }
                 })}
                 placeholder="Contenu de la documentation"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
                 className="border border-gray-300 rounded-md px-3 py-2 text-sm min-h-32"
               />
               {errors.content && (

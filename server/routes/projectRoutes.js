@@ -7,10 +7,12 @@ import {
   getProjectById,
 } from "../controllers/projectController.js";
 import { validateProject } from "../validators/projectValidators.js";
+import { validateIdParam } from "../middleware/validates.js";
 
 const router = express.Router();
 
 router.use(verifyToken);
+router.param("id", validateIdParam);
 
 router.post("/", validateProject, createProject);
 router.get("/", getProjects);

@@ -7,10 +7,13 @@ import {
 } from "../controllers/documentationController.js";
 import { verifyToken } from "../middleware/auth.js";
 import { validateDocumentation } from "../validators/documentationValidator.js";
+import { validateIdParam } from "../middleware/validates.js";
 
 const router = express.Router();
 
 router.use(verifyToken);
+router.param("id", validateIdParam);
+router.param("projectId", validateIdParam);
 
 router.post(
   "/projects/:projectId/documentations",

@@ -42,18 +42,20 @@ export const login = async (req, res) => {
       "SELECT * FROM users WHERE email = ?",
       [email]
     );
-    if (existingUsers.length === 0) {
-      return res.status(404).json({ message: "L'utilisateur n'existe pas" });
-    }
-    const isMatch = await bcrypt.compare(password, existingUsers[0].password);
+    // Même réponse si l'email est inconnu ou le mot de passe faux
+    const isMatch =
+      existingUsers.length > 0 &&
+      (await bcrypt.compare(password, existingUsers[0].password));
     if (!isMatch) {
-      return res.status(401).json({ message: "Mauvais mot de passe" });
+      return res
+        .status(401)
+        .json({ message: "Email ou mot de passe incorrect" });
     }
     const token = jwt.sign({ id: existingUsers[0].id }, process.env.JWT_KEY, {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    res.status(201).json({ token: token });
+    res.status(200).json({ token: token });
   } catch (err) {
     res.status(500).json({
       message: "Erreur lors du login",
@@ -70,7 +72,7 @@ export const getHome = async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ message: "user do not exist" });
     }
-    return res.status(201).json({ user: rows[0] });
+    return res.status(200).json({ user: rows[0] });
   } catch (err) {
     return res.status(500).json({ message: "server error" });
   }

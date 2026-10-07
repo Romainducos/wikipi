@@ -5,41 +5,24 @@ import ActualitySection from "../components/ActualitySection"
 import DocumentCreation from "../components/DocumentCreation"
 import ProjetCreation from "../components/ProjetCreation"
 import { useEffect } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { api } from '../api.js'
 
 const Home = () => {
   const navigate = useNavigate()
 
-  const fetchUser = async () => {
-    let response;
-
-    try {
-      const token = localStorage.getItem('token')
-
-      response = await axios.get('http://localhost:3000/auth/home', {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      })
-
-      if (response.status !== 201) {
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        await api.get('/auth/home')
+      } catch (err) {
+        console.error(err)
         navigate("/login")
-        return
       }
-
-    } catch (err) {
-      navigate("/login")
-      console.log(err)
-      return
     }
 
-    console.log(response.data)
-  }
-
-  useEffect(() => {
     fetchUser()
-  }, [])
+  }, [navigate])
 
   return (
     <Sidebar>
