@@ -5,7 +5,7 @@ import { NavLink, useLocation } from "react-router-dom"
 import { useAuth } from '../../hooks/useAuth'
 import { api, assetUrl } from '../../api'
 import { subscribe, PROPOSALS_CHANGED, GROUPS_CHANGED } from '../../events'
-import { isAdminRole, ROLE_LABELS } from '../../roles'
+import { isAdminRole, isModeratorOrAdminRole, ROLE_LABELS } from '../../roles'
 
 // Compteurs de la navbar : propositions à relire et invitations reçues
 const useNotificationCounts = (enabled) => {
@@ -71,6 +71,14 @@ const Navbar = () => {
                 <span className="block text-xs font-normal">{ROLE_LABELS[authUser.user.role]}</span>
               )}
             </li>
+            {isModeratorOrAdminRole(authUser?.user.role) && (
+              <li>
+                <NavLink to="/moderation">
+                  Modération
+                  {proposalsCount > 0 && <span className="badge badge-primary badge-sm">{proposalsCount}</span>}
+                </NavLink>
+              </li>
+            )}
             {isAdminRole(authUser?.user.role) && (
               <li><NavLink to="/admin">Tableau de bord Admin</NavLink></li>
             )}

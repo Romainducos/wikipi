@@ -35,6 +35,7 @@
 
 ### Administration
 
+- 🛡️ Page Modération (modos et admins) : propositions à traiter, activité récente, demandes de modération
 - 📊 Tableau de bord avec statistiques (utilisateurs, projets, documents)
 - 👥 Gestion des utilisateurs et de leurs rôles
 - 🙋 Validation des demandes pour devenir modérateur
@@ -309,7 +310,7 @@ Toutes les routes sauf l'inscription, la connexion et le mot de passe oublié de
 | ------- | --------------------------------------- | --------------------------- | ------ |
 | POST    | `/api/moderator-requests`               | Demander à devenir modo     | Membre |
 | GET     | `/api/moderator-requests/mine`          | Ma dernière demande         | Tous   |
-| GET     | `/api/moderator-requests`               | Demandes en attente         | Admin  |
+| GET     | `/api/moderator-requests`               | Demandes en attente         | Modo, admin |
 | PUT     | `/api/moderator-requests/:id/accept`    | Accepter                    | Admin  |
 | PUT     | `/api/moderator-requests/:id/reject`    | Refuser                     | Admin  |
 
@@ -321,10 +322,16 @@ Toutes les routes sauf l'inscription, la connexion et le mot de passe oublié de
 | --- | --- |
 | **Super admin** (un seul) | Tout ce que fait un admin + nomme et retire les admins |
 | **Admin** | Tableau de bord, voit tous les projets, valide les demandes de modération, passe un membre en modo et inversement (ne touche pas aux autres admins) |
-| **Modo** | Modifie toutes les documentations, valide les propositions |
+| **Modo** | Page Modération : valide les propositions, suit l'activité récente, voit les demandes de modération (sans les valider) ; modifie les documentations |
 | **Membre** | Crée ses projets et docs, propose des modifications |
 
 Le super admin ne se nomme pas depuis l'application : `npm run set-superadmin -- <email>` (ajouter `--transfer` pour passer le rôle à quelqu'un d'autre). La base garantit qu'il n'y en a qu'un.
+
+### Modération (`/api/moderation`) - Modo et admin
+
+| Méthode | Route                                          | Description                                                     |
+| ------- | ---------------------------------------------- | --------------------------------------------------------------- |
+| GET     | `/api/moderation/activity?type=all\|created\|updated` | 50 dernières docs visibles (les admins voient tout)        |
 
 ## 🔐 Sécurité
 

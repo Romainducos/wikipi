@@ -11,6 +11,7 @@ import Group from './routes/Group'
 import ForgotPassword from './routes/ForgotPassword'
 import ResetPassword from './routes/ResetPassword'
 import NotFound from './routes/NotFound'
+import Moderation from './routes/Moderation'
 import { AuthProvider } from './contexts/AuthProvider'
 import { ProjectsProvider } from './contexts/ProjectProvider'
 import { DocumentationsProvider } from './contexts/DocumentationsProvider'
@@ -31,6 +32,7 @@ const App = () => {
               <Route path="/project/:projectId/documentation/:docId/edit" element={<DocumentEdit />} />
               <Route path="/proposals" element={<Proposals />} />
               <Route path="/group" element={<Group />} />
+              <Route path="/moderation" element={<Moderation />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/settings" element={<Settings />} />

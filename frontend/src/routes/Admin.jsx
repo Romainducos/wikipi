@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useAuthProtection } from '../hooks/useAuthProtection';
 import { api } from '../api';
 import AppLayout from "../components/Layout/AppLayout"
 import Dashboard from "../components/Layout/Dashboard"
 import { ROLE_LABELS, isAdminRole, assignableRoles } from "../roles"
+import ModeratorRequestRow from "../components/Moderation/ModeratorRequestRow"
 const formatDate = (date) => new Date(date).toLocaleDateString("fr-FR")
 
 const Card = ({ title, children }) => (
@@ -15,49 +17,6 @@ const Card = ({ title, children }) => (
     </div>
   </section>
 )
-
-// Demande pour devenir modérateur : accepter / refuser
-const ModeratorRequestRow = ({ request, onDone }) => {
-  const [comment, setComment] = useState("")
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState(null)
-
-  const decide = async (action) => {
-    setBusy(true)
-    setError(null)
-    try {
-      await api.put(`/api/moderator-requests/${request.id}/${action}`, { comment })
-      await onDone()
-    } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors du traitement")
-      setBusy(false)
-    }
-  }
-
-  return (
-    <li className="flex flex-col gap-2 border border-base-300 rounded-box p-4">
-      <div>
-        <span className="font-medium">{request.user_name}</span>{" "}
-        <span className="text-sm text-base-content/70">{request.user_email} · {formatDate(request.created_at)}</span>
-      </div>
-      <blockquote className="border-l-4 border-base-300 pl-3 italic whitespace-pre-line">{request.motivation}</blockquote>
-      <input
-        type="text"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        maxLength={500}
-        placeholder="Commentaire (optionnel)"
-        aria-label={`Commentaire pour ${request.user_name}`}
-        className="input input-sm w-full"
-      />
-      {error && <div role="alert" className="alert alert-error alert-soft">{error}</div>}
-      <div className="flex gap-2 justify-end">
-        <button type="button" className="btn btn-sm btn-error btn-outline" disabled={busy} onClick={() => decide("reject")}>Refuser</button>
-        <button type="button" className="btn btn-sm btn-primary" disabled={busy} onClick={() => decide("accept")}>Nommer modérateur</button>
-      </div>
-    </li>
-  )
-}
 
 const Admin = () => {
   const { loading: authLoading } = useAuthProtection();
@@ -125,6 +84,10 @@ const Admin = () => {
             <Dashboard stats={stats} />
 
             <Card title={`Demandes de modération (${requests.length})`}>
+              <p className="text-sm text-base-content/70">
+                Également visibles par les modérateurs, en lecture seule, sur la page{" "}
+                <NavLink to="/moderation" className="link">Modération</NavLink>.
+              </p>
               {requests.length === 0 ? (
                 <p className="text-base-content/70">Aucune demande en attente.</p>
               ) : (

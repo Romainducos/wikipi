@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken } from "../middleware/auth.js";
-import { isAdmin } from "../middleware/authorize.js";
+import { isAdmin, isModeratorOrAdmin } from "../middleware/authorize.js";
 import { validateIdParam } from "../middleware/validates.js";
 import {
   createRequest,
@@ -18,7 +18,8 @@ router.param("id", validateIdParam);
 router.post("/", createRequest);
 router.get("/mine", getMyRequest);
 
-router.get("/", isAdmin, getPendingRequests);
+// Les modos voient les demandes, seuls les admins les traitent
+router.get("/", isModeratorOrAdmin, getPendingRequests);
 router.put("/:id/accept", isAdmin, acceptRequest);
 router.put("/:id/reject", isAdmin, rejectRequest);
 

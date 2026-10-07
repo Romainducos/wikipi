@@ -7,6 +7,7 @@ import userRoutes from "./routes/userRoutes.js";
 import proposalRoutes from "./routes/proposalRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
 import moderatorRequestRoutes from "./routes/moderatorRequestRoutes.js";
+import moderationRoutes from "./routes/moderationRoutes.js";
 import { UPLOADS_DIR } from "./lib/uploads.js";
 import { frontendUrls } from "./lib/frontendUrls.js";
 
@@ -40,6 +41,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/proposals", proposalRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/moderator-requests", moderatorRequestRoutes);
+app.use("/api/moderation", moderationRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running");
