@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { api } from '../../api'
 import ModeratorRequestModal from './ModeratorRequestModal'
 
-const heroButton = "btn bg-white border-white text-red-secondary hover:bg-neutral-100 disabled:bg-white/70 disabled:text-red-secondary/70"
+const heroButton = "btn bg-white border-white text-red-secondary hover:bg-neutral-100"
 
 const MainWelcomeCard = () => {
     const { user: authUser } = useAuth()
@@ -36,17 +36,23 @@ const MainWelcomeCard = () => {
                         <button type="button" onClick={() => emit(OPEN_PROJECT_MODAL)} className={heroButton}>
                             Créer un nouveau projet
                         </button>
-                        {isMember && (
+                        {isMember && pending && (
+                            // Une demande en attente est une information, pas une action
+                            <span role="status" className="inline-flex items-center gap-2 h-10 px-4 rounded-field bg-white text-red-secondary text-sm font-semibold">
+                                <span className="loading loading-dots loading-xs" aria-hidden="true"></span>
+                                Demande de modération en attente
+                            </span>
+                        )}
+                        {isMember && !pending && (
                             <button
                                 type="button"
                                 className={heroButton}
-                                disabled={pending}
                                 onClick={() => setModalOpen(true)}
                                 title={lastRequest?.status === 'rejected' && lastRequest.review_comment
                                     ? `Dernière demande refusée : ${lastRequest.review_comment}`
                                     : undefined}
                             >
-                                {pending ? "Demande de modération en attente" : "Devenir Modérateur"}
+                                Devenir Modérateur
                             </button>
                         )}
                     </div>
