@@ -8,21 +8,28 @@
 
 ### Authentification & Utilisateurs
 
-- 🔐 Inscription et connexion sécurisées (JWT + bcrypt)
-- 👤 Gestion des profils utilisateurs
-- 🎭 Système de rôles (admin, modo, member)
+- 🔐 Inscription et connexion sécurisées (JWT + bcrypt, limite de tentatives)
+- 🔑 Mot de passe oublié : lien de réinitialisation par email (valable 1 h)
+- 👤 Paramètres du compte : nom, email, photo de profil, mot de passe, thème clair / sombre
+- 🎭 Système de rôles (admin, modo, member), avec demande pour devenir modérateur
 - 🛡️ Routes protégées côté frontend et backend
 
 ### Gestion des Projets
 
-- 📁 Création et consultation de projets
-- 🌐 Projets publics ou privés
-- 👥 Accès contrôlé selon le créateur ou la visibilité
+- 📁 Création, modification et suppression de projets, page de présentation par projet
+- 🌐 Visibilité : public, groupe ou privé
+- 👥 Accès contrôlé selon le créateur, le groupe ou la visibilité (règles centralisées dans `server/lib/access.js`)
+
+### Groupes
+
+- 🧑‍🤝‍🧑 Un utilisateur appartient à un seul groupe, qu'il rejoint en acceptant une invitation
+- 👑 L'owner du groupe gère les membres, les projets du groupe et valide les modifications de leurs documentations
 
 ### Documentation
 
 - 📝 Création de documentations associées à un projet
-- ✍️ Support du Markdown pour le contenu
+- ✍️ Support du Markdown pour le contenu, avec aperçu à l'édition
+- ✏️ L'auteur (ou un modo, admin, owner du groupe) modifie directement ; les autres proposent une modification, relue avec les différences avant / après
 - 📋 Liste des documentations récentes
 - 🔍 Consultation détaillée avec informations sur l'auteur
 
@@ -30,7 +37,7 @@
 
 - 📊 Tableau de bord avec statistiques (utilisateurs, projets, documents)
 - 👥 Gestion des utilisateurs et de leurs rôles
-- 📈 Distribution des rôles et utilisateurs récents
+- 🙋 Validation des demandes pour devenir modérateur
 
 ---
 
@@ -170,6 +177,15 @@ DB_NAME=wikipi
 JWT_KEY=votre_clé_secrète_jwt
 JWT_EXPIRES_IN=7d
 FRONTEND_URL=http://localhost:5173
+
+# Optionnel : envoi des emails « mot de passe oublié ». Sans SMTP_HOST,
+# le lien est affiché dans la console du serveur.
+SMTP_HOST=smtp.exemple.fr
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=utilisateur
+SMTP_PASS=mot_de_passe
+MAIL_FROM="WikiPi <no-reply@exemple.fr>"
 ```
 
 Puis créez / mettez à jour les tables :
@@ -213,38 +229,89 @@ L'application est accessible sur `http://localhost:5173`
 
 ## 📡 API Endpoints
 
+Toutes les routes sauf l'inscription, la connexion et le mot de passe oublié demandent un token (`Authorization: Bearer <token>`).
+
 ### Authentification (`/auth`)
 
-| Méthode | Route            | Description                | Auth |
-| ------- | ---------------- | -------------------------- | ---- |
-| POST    | `/auth/register` | Inscription                | Non  |
-| POST    | `/auth/login`    | Connexion                  | Non  |
-| GET     | `/auth/home`     | Infos utilisateur connecté | Oui  |
+| Méthode | Route                    | Description                                   |
+| ------- | ------------------------ | --------------------------------------------- |
+| POST    | `/auth/register`         | Inscription                                   |
+| POST    | `/auth/login`            | Connexion                                     |
+| POST    | `/auth/forgot-password`  | Envoie un lien de réinitialisation            |
+| POST    | `/auth/reset-password`   | Nouveau mot de passe à partir du lien         |
+| GET     | `/auth/home`             | Utilisateur connecté (rôle, groupe)           |
 
 ### Projets (`/api/projects`)
 
-| Méthode | Route               | Description         | Auth |
-| ------- | ------------------- | ------------------- | ---- |
-| GET     | `/api/projects`     | Liste des projets   | Oui  |
-| GET     | `/api/projects/:id` | Détails d'un projet | Oui  |
-| POST    | `/api/projects`     | Créer un projet     | Oui  |
+| Méthode | Route               | Description                                   |
+| ------- | ------------------- | --------------------------------------------- |
+| GET     | `/api/projects`     | Projets visibles                              |
+| GET     | `/api/projects/:id` | Détail (avec `permissions`)                   |
+| POST    | `/api/projects`     | Créer (`visibility` : public / group / private) |
+| PUT     | `/api/projects/:id` | Modifier (créateur, owner du groupe, admin)   |
+| DELETE  | `/api/projects/:id` | Supprimer avec ses documentations             |
 
 ### Documentations (`/api/documentations`)
 
-| Méthode | Route                                    | Description                 | Auth |
-| ------- | ---------------------------------------- | --------------------------- | ---- |
-| GET     | `/api/documentations`                    | Toutes les documentations   | Oui  |
-| GET     | `/api/documentations/:id`                | Détails d'une documentation | Oui  |
-| GET     | `/api/documentations/project/:projectId` | Docs d'un projet            | Oui  |
-| POST    | `/api/documentations/project/:projectId` | Créer une documentation     | Oui  |
+| Méthode | Route                                                | Description                              |
+| ------- | ---------------------------------------------------- | ---------------------------------------- |
+| GET     | `/api/documentations`                                | 20 dernières documentations visibles     |
+| GET     | `/api/documentations/:id`                            | Détail (avec `permissions`)              |
+| GET     | `/api/documentations/projects/:projectId/documentations` | Docs d'un projet                     |
+| POST    | `/api/documentations/projects/:projectId/documentations` | Créer une documentation              |
+| PUT     | `/api/documentations/:id`                            | Modifier directement                     |
+| DELETE  | `/api/documentations/:id`                            | Supprimer                                |
+| POST    | `/api/documentations/:id/proposals`                  | Proposer une modification                |
 
-### Utilisateurs (`/api/users`) - Admin uniquement
+### Propositions (`/api/proposals`)
 
-| Méthode | Route                 | Description            | Auth  |
-| ------- | --------------------- | ---------------------- | ----- |
-| GET     | `/api/users`          | Liste des utilisateurs | Admin |
-| GET     | `/api/users/stats`    | Statistiques           | Admin |
-| PUT     | `/api/users/:id/role` | Modifier un rôle       | Admin |
+| Méthode | Route                              | Description                        |
+| ------- | ---------------------------------- | ---------------------------------- |
+| GET     | `/api/proposals/to-review`         | Propositions à relire              |
+| GET     | `/api/proposals/to-review/count`   | Nombre à relire                    |
+| GET     | `/api/proposals/mine`              | Mes propositions                   |
+| PUT     | `/api/proposals/:id/accept`        | Accepter et publier                |
+| PUT     | `/api/proposals/:id/reject`        | Refuser                            |
+
+### Groupes (`/api/groups`)
+
+| Méthode | Route                                      | Description                                |
+| ------- | ------------------------------------------ | ------------------------------------------ |
+| GET     | `/api/groups/me`                           | Mon groupe et mes invitations reçues       |
+| GET     | `/api/groups/me/invitations/count`         | Nombre d'invitations reçues                |
+| POST    | `/api/groups`                              | Créer un groupe                            |
+| GET     | `/api/groups/:id`                          | Détail (membres, projets, invitations)     |
+| PUT     | `/api/groups/:id`                          | Modifier (owner)                           |
+| DELETE  | `/api/groups/:id`                          | Supprimer (owner)                          |
+| POST    | `/api/groups/:id/invitations`              | Inviter par email (owner)                  |
+| DELETE  | `/api/groups/:id/invitations/:invitationId`| Annuler une invitation (owner)             |
+| POST    | `/api/groups/invitations/:invitationId/accept`  | Accepter une invitation               |
+| POST    | `/api/groups/invitations/:invitationId/decline` | Refuser une invitation                |
+| PUT     | `/api/groups/:id/members/:userId`          | Changer le rôle owner / member (owner)     |
+| DELETE  | `/api/groups/:id/members/:userId`          | Retirer un membre (owner) ou quitter       |
+
+### Utilisateurs (`/api/users`)
+
+| Méthode | Route                     | Description                    | Accès  |
+| ------- | ------------------------- | ------------------------------ | ------ |
+| GET     | `/api/users/me`           | Mon profil                     | Tous   |
+| PUT     | `/api/users/me`           | Modifier nom et email          | Tous   |
+| PUT     | `/api/users/me/password`  | Changer de mot de passe        | Tous   |
+| POST    | `/api/users/me/avatar`    | Envoyer une photo (2 Mo max)   | Tous   |
+| DELETE  | `/api/users/me/avatar`    | Retirer la photo               | Tous   |
+| GET     | `/api/users`              | Liste des utilisateurs         | Admin  |
+| GET     | `/api/users/admin/stats`  | Statistiques                   | Admin  |
+| PUT     | `/api/users/:id/role`     | Modifier un rôle               | Admin  |
+
+### Demandes de modération (`/api/moderator-requests`)
+
+| Méthode | Route                                   | Description                 | Accès  |
+| ------- | --------------------------------------- | --------------------------- | ------ |
+| POST    | `/api/moderator-requests`               | Demander à devenir modo     | Membre |
+| GET     | `/api/moderator-requests/mine`          | Ma dernière demande         | Tous   |
+| GET     | `/api/moderator-requests`               | Demandes en attente         | Admin  |
+| PUT     | `/api/moderator-requests/:id/accept`    | Accepter                    | Admin  |
+| PUT     | `/api/moderator-requests/:id/reject`    | Refuser                     | Admin  |
 
 ---
 
@@ -254,7 +321,10 @@ L'application est accessible sur `http://localhost:5173`
 - **Authentification** : JWT avec expiration configurable
 - **Autorisation** : Middleware de vérification des rôles
 - **Validation** : express-validator pour les entrées utilisateur
-- **CORS** : Configuré pour les requêtes cross-origin
+- **CORS** : limité à `FRONTEND_URL`
+- **Limite de tentatives** : 10 par 15 min sur connexion, inscription et mot de passe oublié
+- **Réinitialisation** : seul le hash du jeton est stocké, lien à usage unique valable 1 h
+- **Uploads** : images JPG / PNG / WebP de 2 Mo max, servies sur `/uploads`
 
 ---
 

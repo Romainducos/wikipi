@@ -74,7 +74,7 @@ const LoginForm = () => {
               )}
               <div className="flex justify-between">
                 <p className="label text-base-content/70 text-[14px]">Mot de passe</p>
-                <p className="label text-xs text-text-link">Mot de passe oublié ?</p>
+                <NavLink to="/forgot-password" className="label text-xs text-text-link hover:underline">Mot de passe oublié ?</NavLink>
               </div>
             </div>
             <div className="flex flex-col gap-2 items-center">

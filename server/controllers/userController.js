@@ -134,6 +134,10 @@ export const updateUserRole = async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
 
+  if (Number(id) === req.user.id) {
+    return res.status(400).json({ message: "Vous ne pouvez pas changer votre propre rôle" });
+  }
+
   const validRoles = ["admin", "modo", "member"];
   if (!validRoles.includes(role)) {
     return res.status(400).json({ message: "Rôle invalide" });

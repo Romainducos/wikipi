@@ -6,6 +6,7 @@ import documentationRoutes from "./routes/documentationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import proposalRoutes from "./routes/proposalRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
+import moderatorRequestRoutes from "./routes/moderatorRequestRoutes.js";
 import { UPLOADS_DIR } from "./lib/uploads.js";
 
 const requiredEnv = [
@@ -37,6 +38,7 @@ app.use("/api/documentations", documentationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/proposals", proposalRoutes);
 app.use("/api/groups", groupRoutes);
+app.use("/api/moderator-requests", moderatorRequestRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running");

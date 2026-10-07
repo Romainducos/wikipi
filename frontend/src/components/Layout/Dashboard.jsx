@@ -1,16 +1,22 @@
-const Dashboard = ({ data }) => {
+// Statistiques générales du tableau de bord admin
+const Dashboard = ({ stats }) => {
+  if (!stats) {
+    return <p className="text-base-content/70">Statistiques indisponibles.</p>
+  }
+
   return (
-    <div>
-      <h1>
-        Dashboard
-      </h1>
-      <div>
-        Statistiques:
-        <ul>
-          <li>Nombre d'utilisateurs: {data.stats.users}</li>
-          <li>Nombre de projets: {data.stats.projects}</li>
-          <li>Nombre de documents: {data.stats.documents}</li>
-        </ul>
+    <div className="stats stats-vertical sm:stats-horizontal border border-base-300 w-full">
+      <div className="stat">
+        <div className="stat-title">Utilisateurs</div>
+        <div className="stat-value">{stats.users}</div>
+      </div>
+      <div className="stat">
+        <div className="stat-title">Projets</div>
+        <div className="stat-value">{stats.projects}</div>
+      </div>
+      <div className="stat">
+        <div className="stat-title">Documentations</div>
+        <div className="stat-value">{stats.documents}</div>
       </div>
     </div>
   )
