@@ -42,6 +42,17 @@ const ProjectListItem = ({ project }) => {
         {isOpen && (
           <ul className="ml-4 mt-2 space-y-1">
             <li>
+              <NavLink
+                to={`/project/${project.id}`}
+                end
+                className={({ isActive }) =>
+                  `block px-2 py-1 rounded font-medium hover:bg-base-300 ${isActive ? 'bg-base-300' : ''}`
+                }
+              >
+                Vue d'ensemble
+              </NavLink>
+            </li>
+            <li>
               <button
                 type="button"
                 className="btn btn-sm flex justify-start"

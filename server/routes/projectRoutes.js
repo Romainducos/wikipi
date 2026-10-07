@@ -6,6 +6,8 @@ import {
   createProject,
   getProjects,
   getProjectById,
+  updateProject,
+  deleteProject,
 } from "../controllers/projectController.js";
 import { validateProject } from "../validators/projectValidators.js";
 
@@ -17,5 +19,7 @@ router.param("id", validateIdParam);
 router.post("/", validateProject, createProject);
 router.get("/", getProjects);
 router.get("/:id", getProjectById);
+router.put("/:id", validateProject, updateProject);
+router.delete("/:id", deleteProject);
 
 export default router;

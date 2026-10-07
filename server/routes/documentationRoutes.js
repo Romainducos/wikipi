@@ -4,6 +4,7 @@ import {
   createDocumentation,
   getAllDocumentations,
   getDocumentationById,
+  deleteDocumentation,
 } from "../controllers/documentationController.js";
 import { verifyToken } from "../middleware/auth.js";
 import { validateIdParam } from "../middleware/validates.js";
@@ -26,5 +27,6 @@ router.get("/projects/:projectId/documentations", getDocumentationsByProject);
 router.get("/", getAllDocumentations);
 
 router.get("/:id", getDocumentationById);
+router.delete("/:id", deleteDocumentation);
 
 export default router;

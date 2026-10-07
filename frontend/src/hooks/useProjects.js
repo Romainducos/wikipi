@@ -33,78 +33,56 @@ export const useProjects = () => {
     }
   }, [handleError]);
 
-  const loadProject = useCallback(
-    async (projectId) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await api.get(`/api/projects/${projectId}`);
-        const projectData = response.data.project;
-        setCurrentProject(projectData);
-        return projectData;
-      } catch (err) {
-        return handleError(
-          err,
-          `Erreur lors du chargement du projet ${projectId}`
-        );
-      } finally {
-        setLoading(false);
-      }
-    },
-    [handleError]
-  );
+  // Chargement propre à une page : ne touche pas au loading / error de la
+  // liste partagée (sinon la sidebar affiche le chargement ou l'erreur)
+  const loadProject = useCallback(async (projectId) => {
+    const response = await api.get(`/api/projects/${projectId}`);
+    const projectData = response.data.project;
+    setCurrentProject(projectData);
+    return projectData;
+  }, []);
 
   const createProject = useCallback(
     async (projectData) => {
-      setLoading(true);
-      setError(null);
-
       try {
-        await api.post("/api/projects", projectData);
+        const response = await api.post("/api/projects", projectData);
         // Recharge la liste partagée (sidebar, select des modales)
-        await loadProjects();
+        loadProjects().catch(() => {});
+        return response.data.project;
       } catch (err) {
-        return handleError(err, "Erreur lors de la création du projet");
-      } finally {
-        setLoading(false);
+        // L'erreur est affichée par la modale, pas dans les listes
+        console.error("Erreur lors de la création du projet", err);
+        throw err;
       }
     },
-    [handleError, loadProjects]
+    [loadProjects]
   );
 
   const updateProject = useCallback(
     async (projectId, projectData) => {
-      setLoading(true);
-      setError(null);
-
       try {
-        await api.put(`/api/projects/${projectId}`, projectData);
-        await loadProjects();
+        const response = await api.put(`/api/projects/${projectId}`, projectData);
+        loadProjects().catch(() => {});
+        return response.data.project;
       } catch (err) {
-        return handleError(err, "Erreur lors de la mise à jour du projet");
-      } finally {
-        setLoading(false);
+        console.error("Erreur lors de la mise à jour du projet", err);
+        throw err;
       }
     },
-    [handleError, loadProjects]
+    [loadProjects]
   );
 
   const deleteProject = useCallback(
     async (projectId) => {
-      setLoading(true);
-      setError(null);
-
       try {
         await api.delete(`/api/projects/${projectId}`);
-        await loadProjects();
+        loadProjects().catch(() => {});
       } catch (err) {
-        return handleError(err, "Erreur lors de la suppression du projet");
-      } finally {
-        setLoading(false);
+        console.error("Erreur lors de la suppression du projet", err);
+        throw err;
       }
     },
-    [handleError, loadProjects]
+    [loadProjects]
   );
 
   const getProjectById = useCallback(

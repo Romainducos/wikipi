@@ -43,11 +43,11 @@ export const useDocumentations = () => {
     }
   }, [handleError]);
 
+  // Chargements propres à un composant : pas d'écriture dans l'erreur
+  // partagée (affichée par la liste des actualités)
   const loadProjectDocumentations = useCallback(
     async (projectId) => {
       setLoadingProject(true);
-      setError(null);
-
       try {
         const response = await api.get(
           `/api/documentations/projects/${projectId}/documentations`
@@ -55,44 +55,31 @@ export const useDocumentations = () => {
         const docs = response.data.documentations || [];
         setProjectDocumentations(docs);
         return docs;
-      } catch (err) {
-        return handleError(
-          err,
-          `Erreur lors du chargement des documentations du projet ${projectId}`
-        );
       } finally {
         setLoadingProject(false);
       }
     },
-    [handleError]
+    []
   );
 
   const loadDocumentation = useCallback(
     async (docId) => {
       setLoadingCurrent(true);
-      setError(null);
-
       try {
         const response = await api.get(`/api/documentations/${docId}`);
         const doc = response.data.documentation;
         setCurrentDocumentation(doc);
         return doc;
-      } catch (err) {
-        return handleError(
-          err,
-          `Erreur lors du chargement de la documentation ${docId}`
-        );
       } finally {
         setLoadingCurrent(false);
       }
     },
-    [handleError]
+    []
   );
 
   const createDocumentation = useCallback(
     async (projectId, documentationData) => {
       setLoadingAction(true);
-      setError(null);
 
       try {
         const response = await api.post(
@@ -100,31 +87,24 @@ export const useDocumentations = () => {
           documentationData
         );
 
-        const newDoc = response.data.documentation || response.data;
-
-        if (!newDoc) {
-          throw new Error("Documentation créée mais non retournée");
-        }
+        const newDoc = response.data.documentation;
 
         setDocsVersion((v) => v + 1);
         loadDocumentations().catch(() => {});
         return newDoc;
       } catch (err) {
-        return handleError(
-          err,
-          "Erreur lors de la création de la documentation"
-        );
+        console.error("Erreur lors de la création de la documentation", err);
+        throw err;
       } finally {
         setLoadingAction(false);
       }
     },
-    [handleError, loadDocumentations]
+    [loadDocumentations]
   );
 
   const updateDocumentation = useCallback(
     async (docId, docData) => {
       setLoadingAction(true);
-      setError(null);
 
       try {
         await api.put(`/api/documentations/${docId}`, docData);
@@ -132,36 +112,31 @@ export const useDocumentations = () => {
         loadDocumentations().catch(() => {});
         loadDocumentation(docId).catch(() => {});
       } catch (err) {
-        return handleError(
-          err,
-          `Erreur lors de la modification de la documentation ${docId}`
-        );
+        console.error(`Erreur lors de la modification de la documentation ${docId}`, err);
+        throw err;
       } finally {
         setLoadingAction(false);
       }
     },
-    [handleError, loadDocumentations, loadDocumentation]
+    [loadDocumentations, loadDocumentation]
   );
 
   const deleteDocumentation = useCallback(
     async (docId) => {
       setLoadingAction(true);
-      setError(null);
 
       try {
         await api.delete(`/api/documentations/${docId}`);
         setDocsVersion((v) => v + 1);
         loadDocumentations().catch(() => {});
       } catch (err) {
-        return handleError(
-          err,
-          `Erreur lors de la suppression de la documentation ${docId}`
-        );
+        console.error(`Erreur lors de la suppression de la documentation ${docId}`, err);
+        throw err;
       } finally {
         setLoadingAction(false);
       }
     },
-    [handleError, loadDocumentations]
+    [loadDocumentations]
   );
 
   const resetError = useCallback(() => {
