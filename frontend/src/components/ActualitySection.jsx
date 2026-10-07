@@ -72,8 +72,8 @@ const ActualitySection = () => {
             Actualités
           </h1>
           <div className="text-center py-10">
-            <p className="text-gray-500">Aucune documentation disponible</p>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-base-content/70">Aucune documentation disponible</p>
+            <p className="text-sm text-base-content/50 mt-2">
               Créez votre première documentation dans un projet
             </p>
           </div>

@@ -1,7 +1,7 @@
 const DocumentPage = ({ project, documentation }) => {
   return (
     <div>
-      <main className="p-6 mt-30 mx-5 border-1 border-dashed border-gray-200 rounded">
+      <main className="p-6 mt-30 mx-5 border-1 border-dashed border-base-300 rounded">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">{project?.title || "Projet inconnu"}</h1>
@@ -16,7 +16,7 @@ const DocumentPage = ({ project, documentation }) => {
 
         <p>{documentation?.content || "Pas de description pour le moment"}</p>
 
-        <div className="mt-8 pt-6 border-t flex gap-4 text-sm text-gray-600">
+        <div className="mt-8 pt-6 border-t flex gap-4 text-sm text-base-content/70">
           {documentation && (
             <>
               <span>Projet: {project?.title}</span>

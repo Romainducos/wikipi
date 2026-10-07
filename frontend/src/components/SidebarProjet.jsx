@@ -57,7 +57,7 @@ const SidebarProjet = ({ project }) => {
             </label>
           </li>
 
-          {error && <li className="text-sm text-red-500">{error}</li>}
+          {error && <li className="text-sm text-error">{error}</li>}
 
           {documentations.map(doc => (
             <li key={doc.id}>

@@ -21,7 +21,7 @@ const ActualityCard = ({ documentation }) => {
     } = documentation;
 
     return (
-        <div className="card bg-base-100 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 hover:cursor-pointer border border-gray-100">
+        <div className="card bg-base-100 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 hover:cursor-pointer border border-base-300">
             <NavLink to={`/project/${project_id}/documentation/${id}`}>
                 <div className="card-body">
                     <div className="flex items-center justify-between mb-2">
@@ -35,7 +35,7 @@ const ActualityCard = ({ documentation }) => {
                         {title}
                     </h2>
 
-                    <p className="text-gray-600 text-sm line-clamp-3">
+                    <p className="text-base-content/70 text-sm line-clamp-3">
                         {excerpt || truncateText(content, 150)}
                     </p>
 
@@ -51,7 +51,7 @@ const ActualityCard = ({ documentation }) => {
                         </div>
                         <div>
                             <p className="font-medium text-sm">{author_name}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-base-content/70">
                                 {new Date(documentation.created_at).toLocaleDateString('fr-FR')}
                             </p>
                         </div>

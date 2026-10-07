@@ -92,15 +92,15 @@ const DocumentCreation = () => {
       />
 
       <div className="modal backdrop-blur-lg transition-all duration-100 ease-in-out" role="dialog">
-        <div className="modal-box flex flex-col justify-center items-center bg-white rounded-2xl shadow-lg p-10 w-[420px]">
+        <div className="modal-box flex flex-col justify-center items-center bg-base-100 rounded-2xl shadow-lg p-10 w-[420px]">
           <h2 className="text-2xl font-bold text-center mb-6">
             Créer une documentation
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-full">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
-                Projet parent <span className="text-red-700">*</span>
+              <label className="text-sm font-medium text-base-content">
+                Projet parent <span className="text-error">*</span>
               </label>
               <select
                 {...register("projectId", {
@@ -122,16 +122,16 @@ const DocumentCreation = () => {
                 )}
               </select>
               {errors.projectId && (
-                <p className="text-red-500 text-sm">{errors.projectId.message}</p>
+                <p className="text-error text-sm">{errors.projectId.message}</p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-base-content/70">
                 Sélectionnez le projet auquel lier cette documentation
               </p>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
-                Titre de la documentation <span className="text-red-700">*</span>
+              <label className="text-sm font-medium text-base-content">
+                Titre de la documentation <span className="text-error">*</span>
               </label>
               <input
                 {...register("title", {
@@ -139,15 +139,15 @@ const DocumentCreation = () => {
                 })}
                 type="text"
                 placeholder="Titre de la documentation"
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="border border-base-300 rounded-md px-3 py-2 text-sm"
               />
               {errors.title && (
-                <p className="text-red-500 text-sm">{errors.title.message}</p>
+                <p className="text-error text-sm">{errors.title.message}</p>
               )}
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
+              <label className="text-sm font-medium text-base-content">
                 Extrait
               </label>
               <textarea
@@ -158,20 +158,20 @@ const DocumentCreation = () => {
                   }
                 })}
                 placeholder="Courte description"
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm resize-none"
+                className="border border-base-300 rounded-md px-3 py-2 text-sm resize-none"
                 rows="2"
               />
               {errors.excerpt && (
-                <p className="text-red-500 text-sm">{errors.excerpt.message}</p>
+                <p className="text-error text-sm">{errors.excerpt.message}</p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-base-content/70">
                 Résumé court (optionnel, max 50 caractères)
               </p>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
-                Contenu <span className="text-red-700">*</span>
+              <label className="text-sm font-medium text-base-content">
+                Contenu <span className="text-error">*</span>
               </label>
               <textarea
                 {...register("content", {
@@ -182,16 +182,16 @@ const DocumentCreation = () => {
                   }
                 })}
                 placeholder="Contenu de la documentation"
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm min-h-32"
+                className="border border-base-300 rounded-md px-3 py-2 text-sm min-h-32"
               />
               {errors.content && (
-                <p className="text-red-500 text-sm">{errors.content.message}</p>
+                <p className="text-error text-sm">{errors.content.message}</p>
               )}
               <div className="flex justify-between">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-base-content/70">
                   Contenu principal en Markdown
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-base-content/70">
                   {content.length}/10000 caractères
                 </p>
               </div>

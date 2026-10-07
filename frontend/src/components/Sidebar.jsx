@@ -61,9 +61,9 @@ const Sidebar = ({ children }) => {
           ></label>
           <ul className="menu bg-base-200 min-h-full w-80 p-4">
             {/* La search bar */}
-            <label className="flex justify-between w-9/10 rounded-box border border-gray-300">
+            <label className="flex justify-between w-9/10 rounded-box border border-base-300">
               <div className="flex items-center gap-2 mx-2">
-                <Loupe strokeColor="black" />
+                <Loupe strokeColor="currentColor" />
               </div>
               <input
                 className="appearance-none pl-2"
@@ -85,19 +85,19 @@ const Sidebar = ({ children }) => {
               </li>
 
               {loading && (
-                <li className="text-gray-500 italic text-center py-4">
+                <li className="text-base-content/70 italic text-center py-4">
                   Chargement des projets...
                 </li>
               )}
 
               {error && (
-                <li className="text-red-500 italic text-center py-4">
+                <li className="text-error italic text-center py-4">
                   {error}
                 </li>
               )}
 
               {!loading && !error && filteredProjects.length === 0 ? (
-                <li className="text-gray-500 italic text-center py-4">
+                <li className="text-base-content/70 italic text-center py-4">
                   Aucun project trouvé
                 </li>
               ) : (

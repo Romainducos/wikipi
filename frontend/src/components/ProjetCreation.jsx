@@ -39,13 +39,13 @@ const ProjetCreation = () => {
     <div>
       <input ref={modalCheckboxRef} type="checkbox" id="projet-modal" className="modal-toggle" />
       <div className="modal backdrop-blur-lg transition-all duration-100 ease-in-out" role="dialog">
-        <div className="modal-box flex flex-col justify-center items-center bg-white rounded-2xl shadow-lg p-10 w-[420px]">
+        <div className="modal-box flex flex-col justify-center items-center bg-base-100 rounded-2xl shadow-lg p-10 w-[420px]">
           <h2 className="text-3xl font-bold text-center mb-6">
             Créer un projet
           </h2>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
+              <label className="text-sm font-medium text-base-content">
                 Intitulé du projet *
               </label>
               <input
@@ -53,26 +53,26 @@ const ProjetCreation = () => {
                 type="text"
                 required
                 placeholder="Intitulé du projet"
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                className="border border-base-300 rounded-md px-3 py-2 text-sm"
               />
               {errors.title && (
-                <p className="text-red-500 text-sm">{errors.title.message}</p>
+                <p className="text-error text-sm">{errors.title.message}</p>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
+              <label className="text-sm font-medium text-base-content">
                 Description
               </label>
               <textarea
                 {...register("description")}
                 placeholder="Description"
                 maxLength={350}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm h-24 resize-none"
+                className="border border-base-300 rounded-md px-3 py-2 text-sm h-24 resize-none"
               />
               {errors.description && (
-                <p className="text-red-500 text-sm">{errors.description.message}</p>
+                <p className="text-error text-sm">{errors.description.message}</p>
               )}
-              <p className="text-xs text-gray-500 text-right">
+              <p className="text-xs text-base-content/70 text-right">
                 {description.length}/350 caractères
               </p>
             </div>

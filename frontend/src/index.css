@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
 
 @theme{
   --color-red-primary: #DC2626;
@@ -9,4 +11,21 @@
   --color-text-secondary: #6B7280;
   --color-text-terciary: #9CA4AF;
   --color-text-link: #3B82F6;
+}
+
+/* Couleurs de texte lisibles sur le thème sombre de daisyUI */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-text-primary: #E5E7EB;
+    --color-text-secondary: #9CA3AF;
+    --color-text-terciary: #6B7280;
+    --color-text-link: #60A5FA;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-text-primary: #E5E7EB;
+  --color-text-secondary: #9CA3AF;
+  --color-text-terciary: #6B7280;
+  --color-text-link: #60A5FA;
 }
