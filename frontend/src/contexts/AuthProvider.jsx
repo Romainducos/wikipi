@@ -18,11 +18,9 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await api.get('http://localhost:3000/auth/home', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await api.get('/auth/home')
 
-      if (response.status === 201 || response.status === 200) {
+      if (response.status === 200) {
         setUser(response.data)
         return response.data
       }

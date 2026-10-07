@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 const DocumentPage = ({ project, documentation }) => {
   return (
     <div>
-      <main className="p-6 mt-30 mx-5 border-1 border-dashed border-gray-200 rounded">
+      <main className="p-6 mt-30 mx-5 border-1 border-dashed border-base-300 rounded">
 
         <div className="flex justify-between items-center mb-6 pb-6 border-b">
           <div>
@@ -12,7 +12,7 @@ const DocumentPage = ({ project, documentation }) => {
           </div>
 
           {documentation && (
-            <button className="text-blue-500 hover:cursor-pointer hover:underline">
+            <button type="button" className="btn btn-link">
               Soumettre une modification
             </button>
           )}
@@ -28,7 +28,7 @@ const DocumentPage = ({ project, documentation }) => {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t flex gap-4 text-sm text-gray-600">
+        <div className="mt-8 pt-6 border-t flex gap-4 text-sm text-base-content/70">
           {documentation && (
             <>
               <span>Projet: {project?.title}</span>

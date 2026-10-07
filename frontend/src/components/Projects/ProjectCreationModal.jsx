@@ -1,77 +1,100 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useProjectsContext } from '../../hooks/useProjectsContext'
+import { subscribe, OPEN_PROJECT_MODAL } from '../../events'
+import { focusAfterOpen } from '../../focusAfterOpen'
 
 const ProjectCreationModal = () => {
-  const [description, setDescription] = useState("")
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm()
+  const dialogRef = useRef(null)
+  const [submitError, setSubmitError] = useState(null)
+  const { register, handleSubmit, watch, reset, setFocus, formState: { errors, isSubmitting } } = useForm()
+  const description = watch("description") || ""
 
   const { createProject } = useProjectsContext()
 
+  useEffect(() => {
+    return subscribe(OPEN_PROJECT_MODAL, () => {
+      dialogRef.current?.showModal()
+      focusAfterOpen(dialogRef.current, () => setFocus("title"))
+    })
+  }, [setFocus])
+
+  const handleClose = () => {
+    reset()
+    setSubmitError(null)
+  }
+
   const onSubmit = async (data) => {
+    setSubmitError(null)
     try {
       await createProject({
-        title: data.title,
-        description: data.description
+        title: data.title.trim(),
+        description: data.description?.trim() || null
       })
+      dialogRef.current?.close()
     } catch (error) {
-      console.error(error)
+      setSubmitError(error.response?.data?.message || "Erreur lors de la création du projet")
     }
   }
 
   return (
-    <div>
-      <input type="checkbox" id="project-modal" className="modal-toggle" />
-      <div className="modal backdrop-blur-lg transition-all duration-100 ease-in-out" role="dialog">
-        <div className="modal-box flex flex-col justify-center items-center bg-white rounded-2xl shadow-lg p-10 w-[420px]">
-          <h2 className="text-3xl font-bold text-center mb-6">
-            Créer un projet
-          </h2>
+    <dialog
+      ref={dialogRef}
+      id="project-modal"
+      className="modal backdrop-blur-lg"
+      onClose={handleClose}
+    >
+      <div className="modal-box flex flex-col items-center p-10 w-[420px]">
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Créer un projet
+        </h2>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
-                Intitulé du projet *
-              </label>
-              <input
-                {...register("title", { required: "Intitulé du projet obligatoire" })}
-                type="text"
-                placeholder="Intitulé du projet"
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-              />
-              {errors.title && (
-                <p className="text-red-500 text-sm">{errors.title.message}</p>
-              )}
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 w-full">
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">
+              Intitulé du projet <span className="text-error">*</span>
+            </legend>
+            <input
+              {...register("title", { required: "Intitulé du projet obligatoire" })}
+              type="text"
+              placeholder="Intitulé du projet"
+              className={`input w-full ${errors.title ? "input-error" : ""}`}
+            />
+            {errors.title && (
+              <p className="label text-error">{errors.title.message}</p>
+            )}
+          </fieldset>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
-                Description
-              </label>
-              <textarea
-                {...register("description")}
-                placeholder="Description"
-                maxLength={350}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm h-24 resize-none"
-              />
-              <p className="text-xs text-gray-500 text-right">
-                {description.length}/350 caractères
-              </p>
-            </div>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Description</legend>
+            <textarea
+              {...register("description")}
+              placeholder="Description"
+              maxLength={350}
+              className="textarea w-full h-24 resize-none"
+            />
+            <p className="label justify-end">
+              {description.length}/350 caractères
+            </p>
+          </fieldset>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-md mt-2 transition-colors">
-              {isSubmitting ? "Création..." : "Créer le projet"}
-            </button>
-          </form>
-        </div>
-        <label className="modal-backdrop" htmlFor="project-modal">Close</label>
+          {submitError && (
+            <div role="alert" className="alert alert-error alert-soft">{submitError}</div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="btn btn-primary w-full mt-4"
+          >
+            {isSubmitting ? "Création..." : "Créer le projet"}
+          </button>
+        </form>
       </div>
-    </div>
+      <form method="dialog" className="modal-backdrop">
+        <button>Fermer</button>
+      </form>
+    </dialog>
   )
 }
 

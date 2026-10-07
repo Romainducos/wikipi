@@ -1,3 +1,5 @@
+import { emit, OPEN_PROJECT_MODAL } from '../../events'
+
 const MainWelcomeCard = () => {
     return (
         <div className="w-full flex justify-center mt-6">
@@ -8,10 +10,10 @@ const MainWelcomeCard = () => {
                         <h1 className="text-5xl font-bold text-white">WikIpi</h1>
                     </div>
                     <div className="flex md:flex-row flex-col gap-2">
-                        <label htmlFor="project-modal" className="btn bg-white text-red-secondary hover:bg-black hover:text-white">
+                        <button type="button" onClick={() => emit(OPEN_PROJECT_MODAL)} className="btn bg-white border-white text-red-secondary hover:bg-neutral-100">
                             Créer un nouveau projet
-                        </label>
-                        <button className="btn bg-white text-red-secondary hover:bg-black hover:text-white">Devenir Modérateur</button>
+                        </button>
+                        <button type="button" className="btn bg-white border-white text-red-secondary hover:bg-neutral-100">Devenir Modérateur</button>
                     </div>
                 </div>
             </div>

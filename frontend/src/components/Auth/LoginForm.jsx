@@ -4,7 +4,7 @@ import logo from "../../assets/Logo_wikiPi.png"
 import panda from "../../assets/login_panda.png"
 import { NavLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios"
+import { api } from "../../api"
 import { useState } from 'react'
 import { useAuth } from "../../hooks/useAuth";
 
@@ -17,13 +17,13 @@ const LoginForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:3000/auth/login", data);
-      console.log("Success:", response.data);
-      if (response.status === 201) {
+      const response = await api.post("/auth/login", data);
+      if (response.status === 200) {
         login(response.data.token)
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Login error:", error);
+      alert(error.response?.data?.message || "Erreur lors de la connexion");
     }
   };
 
@@ -31,12 +31,12 @@ const LoginForm = () => {
   return (
     <div className="flex justify-center gap-8">
       <div className="flex justify-center items-center h-screen">
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col justify-center items-center p-8 h-min w-min drop-shadow-2xl rounded-md">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-base-100 flex flex-col justify-center items-center p-8 h-min w-min drop-shadow-2xl rounded-md border border-base-300">
           <img src={logo} alt="Logo" className="mb-4" />
           <fieldset className="fieldset w-[300px] p-6 gap-10">
             <legend className="fieldset-legend text-3xl font-bold">Connexion</legend>
             <div>
-              <label htmlFor="email" className="label text-[16px] font-medium text-gray-800">Email</label>
+              <label htmlFor="email" className="label text-[16px] font-medium text-base-content">Email</label>
               <label className="input validator">
                 <input
                   {...register("email", {
@@ -49,12 +49,12 @@ const LoginForm = () => {
                   type="email" required placeholder="Email" name="email" />
               </label>
               {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
+                <p className="text-error text-sm">{errors.email.message}</p>
               )}
-              <p className="label text-gray-500 text-[14px]">Adresse email du campus</p>
+              <p className="label text-base-content/70 text-[14px]">Adresse email du campus</p>
             </div>
             <div>
-              <label htmlFor="password" className="label text-[16px] font-medium text-gray-800">Mot de passe</label>
+              <label htmlFor="password" className="label text-[16px] font-medium text-base-content">Mot de passe</label>
               <label className="input validator">
                 <input
                   {...register("password", {
@@ -70,10 +70,10 @@ const LoginForm = () => {
                 </button>
               </label>
               {errors.password && (
-                <p className="text-red-500 text-sm">{errors.password.message}</p>
+                <p className="text-error text-sm">{errors.password.message}</p>
               )}
               <div className="flex justify-between">
-                <p className="label text-gray-500 text-[14px]">Mot de passe</p>
+                <p className="label text-base-content/70 text-[14px]">Mot de passe</p>
                 <p className="label text-xs text-text-link">Mot de passe oublié ?</p>
               </div>
             </div>
@@ -81,12 +81,12 @@ const LoginForm = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn bg-red-primary text-white px-6 py-3 font-normal text-[16px] rounded-md w-full"
+                className="btn btn-primary font-normal text-[16px] w-full"
               >
                 {isSubmitting ? "Chargement..." : "Connexion"}
               </button>
               <div className="flex gap-1">
-                <p className="label text-gray-500 text-xs">Pas encore de compte ? </p>
+                <p className="label text-base-content/70 text-xs">Pas encore de compte ? </p>
                 <NavLink to="/Register" className="label text-xs text-text-link"> Inscrivez-vous</NavLink>
               </div>
             </div>

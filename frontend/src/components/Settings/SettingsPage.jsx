@@ -12,14 +12,14 @@ const SettingsPage = () => {
         <input
           type="text"
           placeholder={authUser?.user.name || "User"}
-          className="border p-2 rounded-xl border-dashed border-gray-300"
+          className="border p-2 rounded-xl border-dashed border-base-300"
         />
 
         <h2>Changer mot de passe :</h2>
         <input
           type="text"
           placeholder="Nouveau mot de passe"
-          className="border p-2 rounded-xl border-dashed border-gray-300"
+          className="border p-2 rounded-xl border-dashed border-base-300"
         />
         <h2>Changer l'image de profil:</h2>
         <img src={user} alt="User Avatar" className="w-50 rounded-full hover:cursor-pointer" />

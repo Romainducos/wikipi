@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import ProjectList from '../Projects/ProjectList'
 import ProjectSearch from '../Projects/ProjectSearch'
 import { useProjectsContext } from '../../hooks/useProjectsContext'
+import { emit, OPEN_PROJECT_MODAL } from '../../events'
 
 const ProjectSidebar = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -28,13 +29,16 @@ const ProjectSidebar = ({ children }) => {
 
           <ul className="menu bg-base-200 rounded-box w-9/10">
             <li>
-              <label
-                htmlFor="project-modal" className="btn flex justify-start w-full mb-4">
+              <button
+                type="button"
+                onClick={() => emit(OPEN_PROJECT_MODAL)}
+                className="btn flex justify-start w-full mb-4"
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
                 Nouveau Projet
-              </label>
+              </button>
             </li>
 
             <ProjectList

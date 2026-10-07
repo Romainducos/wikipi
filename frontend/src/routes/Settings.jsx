@@ -5,7 +5,7 @@ const Settings = () =>{
     return(
         <div>
             <NavigationBar/>
-            <main className="border p-6 m-6 mt-26 rounded-xl border-dashed border-gray-300 bg-white">
+            <main className="border p-6 m-6 mt-26 rounded-xl border-dashed border-base-300 bg-base-100">
                 <SettingsPage/>
             </main>
         </div>

@@ -62,15 +62,15 @@ export const useProjects = () => {
 
       try {
         await api.post("/api/projects", projectData);
-
-        window.location.reload();
+        // Recharge la liste partagée (sidebar, select des modales)
+        await loadProjects();
       } catch (err) {
         return handleError(err, "Erreur lors de la création du projet");
       } finally {
         setLoading(false);
       }
     },
-    [handleError]
+    [handleError, loadProjects]
   );
 
   const updateProject = useCallback(
@@ -80,15 +80,14 @@ export const useProjects = () => {
 
       try {
         await api.put(`/api/projects/${projectId}`, projectData);
-
-        window.location.reload();
+        await loadProjects();
       } catch (err) {
         return handleError(err, "Erreur lors de la mise à jour du projet");
       } finally {
         setLoading(false);
       }
     },
-    [handleError]
+    [handleError, loadProjects]
   );
 
   const deleteProject = useCallback(
@@ -98,15 +97,14 @@ export const useProjects = () => {
 
       try {
         await api.delete(`/api/projects/${projectId}`);
-
-        window.location.reload();
+        await loadProjects();
       } catch (err) {
         return handleError(err, "Erreur lors de la suppression du projet");
       } finally {
         setLoading(false);
       }
     },
-    [handleError]
+    [handleError, loadProjects]
   );
 
   const getProjectById = useCallback(

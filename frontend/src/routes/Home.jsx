@@ -19,7 +19,7 @@ const Home = () => {
   return (
     <AppLayout>
       <main>
-        <div className="border m-6 mt-26 rounded-xl border-dashed border-gray-300 bg-white">
+        <div className="border m-6 mt-26 rounded-xl border-dashed border-base-300 bg-base-100">
           <WelcomeHero />
           <DocumentListSection />
         </div>

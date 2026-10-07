@@ -3,7 +3,7 @@ import { FaRegEyeSlash } from "react-icons/fa";
 import logo from "../../assets/Logo_wikiPi.png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { api } from "../../api";
 import { useState } from 'react'
 
 const RegisterForm = () => {
@@ -21,16 +21,15 @@ const RegisterForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:3000/auth/register", data);
-      console.log("Success:", response.data);
+      const { name, email, password } = data;
+      const response = await api.post("/auth/register", { name, email, password });
       if (response.status === 201) {
         navigate('/login')
       }
     } catch (error) {
       console.error("Registration error:", error);
-      if (error.response?.data?.message) {
-        alert(error.response.data.message);
-      }
+      const responseData = error.response?.data;
+      alert(responseData?.errors?.[0]?.msg || responseData?.message || "Erreur lors de l'inscription");
     }
   };
 
@@ -38,7 +37,7 @@ const RegisterForm = () => {
     <div className="flex justify-center items-center h-screen">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white flex flex-col justify-center items-center p-8 h-min w-min drop-shadow-2xl rounded-md"
+        className="bg-base-100 flex flex-col justify-center items-center p-8 h-min w-min drop-shadow-2xl rounded-md border border-base-300"
       >
         <img src={logo} alt="Logo" className="mb-4" />
 
@@ -47,7 +46,7 @@ const RegisterForm = () => {
 
           {/* USERNAME */}
           <div>
-            <label className="label text-[16px] font-medium text-gray-800">
+            <label className="label text-[16px] font-medium text-base-content">
               Nom d'utilisateur
             </label>
 
@@ -60,13 +59,13 @@ const RegisterForm = () => {
             </label>
 
             {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
+              <p className="text-error text-sm">{errors.name.message}</p>
             )}
           </div>
 
           {/* EMAIL */}
           <div>
-            <label className="label text-[16px] font-medium text-gray-800">Email</label>
+            <label className="label text-[16px] font-medium text-base-content">Email</label>
 
             <label className="input validator">
               <input
@@ -83,17 +82,17 @@ const RegisterForm = () => {
             </label>
 
             {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
+              <p className="text-error text-sm">{errors.email.message}</p>
             )}
 
-            <p className="label text-gray-500 text-[14px]">
+            <p className="label text-base-content/70 text-[14px]">
               Adresse email du campus
             </p>
           </div>
 
           {/* PASSWORD */}
           <div>
-            <label className="label text-[16px] font-medium text-gray-800">
+            <label className="label text-[16px] font-medium text-base-content">
               Mot de passe
             </label>
 
@@ -115,13 +114,13 @@ const RegisterForm = () => {
             </label>
 
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
+              <p className="text-error text-sm">{errors.password.message}</p>
             )}
           </div>
 
           {/* CONFIRM PASSWORD */}
           <div>
-            <label className="label text-[16px] font-medium text-gray-800">
+            <label className="label text-[16px] font-medium text-base-content">
               Confirmation du mot de passe
             </label>
 
@@ -141,7 +140,7 @@ const RegisterForm = () => {
             </label>
 
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm">
+              <p className="text-error text-sm">
                 {errors.confirmPassword.message}
               </p>
             )}
@@ -152,13 +151,13 @@ const RegisterForm = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn bg-red-primary text-white px-6 py-3 font-normal text-[16px] rounded-md w-full"
+              className="btn btn-primary font-normal text-[16px] w-full"
             >
               {isSubmitting ? "Chargement..." : "Inscription"}
             </button>
 
             <div className="flex gap-1">
-              <p className="label text-gray-500 text-xs">Déjà un compte ?</p>
+              <p className="label text-base-content/70 text-xs">Déjà un compte ?</p>
               <NavLink to="/Login" className="label text-xs text-text-link">
                 Connectez-vous
               </NavLink>

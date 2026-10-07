@@ -9,7 +9,7 @@ const ProjectList = ({ projects, loading, error, searchTerm }) => {
 
   if (loading) {
     return (
-      <li className="text-gray-500 italic text-center py-4">
+      <li className="text-base-content/70 italic text-center py-4">
         Chargement des projets...
       </li>
     )
@@ -17,7 +17,7 @@ const ProjectList = ({ projects, loading, error, searchTerm }) => {
 
   if (error) {
     return (
-      <li className="text-red-500 italic text-center py-4">
+      <li className="text-error italic text-center py-4">
         {error}
       </li>
     )
@@ -25,7 +25,7 @@ const ProjectList = ({ projects, loading, error, searchTerm }) => {
 
   if (filteredProjects.length === 0) {
     return (
-      <li className="text-gray-500 italic text-center py-4">
+      <li className="text-base-content/70 italic text-center py-4">
         {searchTerm ? 'Aucun projet trouvé' : 'Aucun projet'}
       </li>
     )

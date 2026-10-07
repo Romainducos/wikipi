@@ -1,7 +1,4 @@
 const Dashboard = ({ data }) => {
-  console.log(data.stats);
-  console.log(data.users);
-
   return (
     <div>
       <h1>

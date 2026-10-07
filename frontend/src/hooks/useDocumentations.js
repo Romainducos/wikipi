@@ -13,6 +13,10 @@ export const useDocumentations = () => {
 
   const [error, setError] = useState(null);
 
+  // Incrémenté à chaque création / modification / suppression, pour que les
+  // listes locales (ex. docs d'un projet dans la sidebar) se rechargent
+  const [docsVersion, setDocsVersion] = useState(0);
+
   const handleError = useCallback((err, defaultMessage) => {
     const errorMessage =
       err.response?.data?.message ||
@@ -102,13 +106,8 @@ export const useDocumentations = () => {
           throw new Error("Documentation créée mais non retournée");
         }
 
-        const url = new URL(window.location.href);
-        url.searchParams.delete("nouvelleDoc");
-        window.history.replaceState({}, "", url.toString());
-
-        const modal = document.getElementById("doc-modal");
-        if (modal) modal.checked = false;
-        window.location.reload();
+        setDocsVersion((v) => v + 1);
+        loadDocumentations().catch(() => {});
         return newDoc;
       } catch (err) {
         return handleError(
@@ -119,7 +118,7 @@ export const useDocumentations = () => {
         setLoadingAction(false);
       }
     },
-    [handleError]
+    [handleError, loadDocumentations]
   );
 
   const updateDocumentation = useCallback(
@@ -129,8 +128,9 @@ export const useDocumentations = () => {
 
       try {
         await api.put(`/api/documentations/${docId}`, docData);
-
-        window.location.reload();
+        setDocsVersion((v) => v + 1);
+        loadDocumentations().catch(() => {});
+        loadDocumentation(docId).catch(() => {});
       } catch (err) {
         return handleError(
           err,
@@ -140,7 +140,7 @@ export const useDocumentations = () => {
         setLoadingAction(false);
       }
     },
-    [handleError]
+    [handleError, loadDocumentations, loadDocumentation]
   );
 
   const deleteDocumentation = useCallback(
@@ -150,8 +150,8 @@ export const useDocumentations = () => {
 
       try {
         await api.delete(`/api/documentations/${docId}`);
-
-        window.location.reload();
+        setDocsVersion((v) => v + 1);
+        loadDocumentations().catch(() => {});
       } catch (err) {
         return handleError(
           err,
@@ -161,7 +161,7 @@ export const useDocumentations = () => {
         setLoadingAction(false);
       }
     },
-    [handleError]
+    [handleError, loadDocumentations]
   );
 
   const resetError = useCallback(() => {
@@ -177,6 +177,7 @@ export const useDocumentations = () => {
     loadingCurrent,
     loadingAction,
     error,
+    docsVersion,
 
     loadDocumentations,
     loadProjectDocumentations,
