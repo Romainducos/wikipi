@@ -139,47 +139,18 @@ cd wikipi
 
 ### 2. Configuration de la base de données
 
-Créez une base de données MySQL et exécutez le schéma suivant :
+Créez une base de données MySQL vide :
 
 ```sql
 CREATE DATABASE wikipi;
-USE wikipi;
-
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'modo', 'member') DEFAULT 'member',
-    avatar_url VARCHAR(500),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE projects (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL UNIQUE,
-    description TEXT,
-    created_by INT NOT NULL,
-    is_public BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (created_by) REFERENCES users(id)
-);
-
-CREATE TABLE documentations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    excerpt VARCHAR(500),
-    content LONGTEXT,
-    project_id INT NOT NULL,
-    created_by INT NOT NULL,
-    last_modified_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id),
-    FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (last_modified_by) REFERENCES users(id)
-);
 ```
+
+Les tables sont créées et mises à jour par le script de migrations (étape 3) :
+
+- `server/db/schema.sql` : schéma de départ, utilisé seulement sur une base vide ;
+- `server/db/migrations/*.sql` : évolutions du schéma, appliquées dans l'ordre et une seule fois (suivies dans la table `schema_migrations`).
+
+Pour faire évoluer la base, ajoutez un nouveau fichier `NNN_description.sql` dans `server/db/migrations/` : ne modifiez jamais une migration déjà appliquée.
 
 ### 3. Configuration du Backend
 
@@ -198,7 +169,16 @@ DB_PASS=votre_mot_de_passe_mysql
 DB_NAME=wikipi
 JWT_KEY=votre_clé_secrète_jwt
 JWT_EXPIRES_IN=7d
+FRONTEND_URL=http://localhost:5173
 ```
+
+Puis créez / mettez à jour les tables :
+
+```bash
+npm run migrate
+```
+
+À relancer après chaque `git pull` qui ajoute une migration.
 
 ### 4. Configuration du Frontend
 
@@ -292,7 +272,8 @@ npm run lint     # Analyse le code avec ESLint
 ### Backend
 
 ```bash
-npm start        # Démarre le serveur avec nodemon (hot reload)
+npm start        # Démarre le serveur (node --watch : redémarre à chaque modification)
+npm run migrate  # Crée / met à jour les tables de la base
 ```
 
 ---
