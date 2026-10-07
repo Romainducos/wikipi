@@ -3,7 +3,7 @@ import { MdAdd } from 'react-icons/md';
 import Loupe from "./Loupe.jsx";
 import SidebarProjet from "./SidebarProjet.jsx";
 import { api } from '../api.js';
-import { subscribe, PROJECTS_CHANGED } from '../events.js';
+import { emit, subscribe, OPEN_PROJECT_MODAL, PROJECTS_CHANGED } from '../events.js';
 
 const Sidebar = ({ children }) => {
   const [projects, setProjects] = useState([]);
@@ -61,27 +61,30 @@ const Sidebar = ({ children }) => {
           ></label>
           <ul className="menu bg-base-200 min-h-full w-80 p-4">
             {/* La search bar */}
-            <label className="flex justify-between w-9/10 rounded-box border border-base-300">
-              <div className="flex items-center gap-2 mx-2">
+            <div className="join w-9/10">
+              <label className="input join-item w-full">
                 <Loupe strokeColor="currentColor" />
-              </div>
-              <input
-                className="appearance-none pl-2"
-                type="text"
-                required
-                placeholder="Search"
-                onChange={handleFilter}
-              />
-              <button className="btn btn-square join-item bg-red-primary hover:bg-red-secondary rounded-e-box">
-                <Loupe strokeColor="white" />
+                <input
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Rechercher un projet"
+                  onChange={handleFilter}
+                />
+              </label>
+              <button type="button" aria-label="Rechercher" className="btn btn-primary btn-square join-item">
+                <Loupe strokeColor="currentColor" />
               </button>
-            </label>
+            </div>
 
             <ul className="menu bg-base-200 rounded-box w-9/10">
               <li>
-                <label htmlFor="projet-modal" className="btn flex justify-start w-full mb-4">
+                <button
+                  type="button"
+                  onClick={() => emit(OPEN_PROJECT_MODAL)}
+                  className="btn flex justify-start w-full mb-4"
+                >
                   <MdAdd /> Nouveau Projet
-                </label>
+                </button>
               </li>
 
               {loading && (

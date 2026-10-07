@@ -3,15 +3,16 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { useForm } from "react-hook-form";
 import { emit, subscribe, DOCUMENTATIONS_CHANGED, PROJECTS_CHANGED } from '../events.js';
+import { focusAfterOpen } from '../focusAfterOpen.js';
 
 const DocumentCreation = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, setValue, reset, setFocus, formState: { errors, isSubmitting } } = useForm({
     defaultValues: { projectId: "", title: "", excerpt: "", content: "" },
   });
 
-  const modalCheckboxRef = useRef(null);
+  const dialogRef = useRef(null);
   const selectedProjectId = watch("projectId");
   const content = watch("content") || "";
   const [projects, setProjects] = useState([]);
@@ -35,20 +36,21 @@ const DocumentCreation = () => {
 
   useEffect(() => {
     const projetId = searchParams.get('nouvelleDoc');
-    if (projetId && modalCheckboxRef.current) {
-      modalCheckboxRef.current.checked = true;
+    const dialog = dialogRef.current;
+    if (projetId && dialog) {
+      if (!dialog.open) {
+        dialog.showModal();
+        focusAfterOpen(() => setFocus("title"));
+      }
       const projetExiste = projects.find(p => p.id.toString() === projetId);
       if (projetExiste) {
         setValue("projectId", projetId);
       }
     }
-  }, [searchParams, projects, setValue]);
+  }, [searchParams, projects, setValue, setFocus]);
 
   const handleCloseModal = () => {
     navigate({ search: '' });
-    if (modalCheckboxRef.current) {
-      modalCheckboxRef.current.checked = false;
-    }
     reset();
   };
 
@@ -66,7 +68,7 @@ const DocumentCreation = () => {
       );
 
       if (response.status === 201) {
-        handleCloseModal();
+        dialogRef.current?.close();
         emit(DOCUMENTATIONS_CHANGED);
       }
 
@@ -83,133 +85,122 @@ const DocumentCreation = () => {
   };
 
   return (
-    <div>
-      <input
-        ref={modalCheckboxRef}
-        type="checkbox"
-        id="doc-modal"
-        className="modal-toggle"
-      />
+    <dialog
+      ref={dialogRef}
+      id="doc-modal"
+      className="modal backdrop-blur-lg"
+      onClose={handleCloseModal}
+    >
+      <div className="modal-box flex flex-col items-center p-10 w-[420px]">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Créer une documentation
+        </h2>
 
-      <div className="modal backdrop-blur-lg transition-all duration-100 ease-in-out" role="dialog">
-        <div className="modal-box flex flex-col justify-center items-center bg-base-100 rounded-2xl shadow-lg p-10 w-[420px]">
-          <h2 className="text-2xl font-bold text-center mb-6">
-            Créer une documentation
-          </h2>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-full">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-base-content">
-                Projet parent <span className="text-error">*</span>
-              </label>
-              <select
-                {...register("projectId", {
-                  required: "Sélectionnez un projet",
-                  validate: value => value !== "" || "Sélectionnez un projet"
-                })}
-                className="select select-neutral validator"
-                disabled={loading}
-              >
-                <option value="">Choisir un projet...</option>
-                {loading ? (
-                  <option disabled>Chargement des projets...</option>
-                ) : (
-                  projects.map((projet) => (
-                    <option key={projet.id} value={projet.id}>
-                      {projet.title}
-                    </option>
-                  ))
-                )}
-              </select>
-              {errors.projectId && (
-                <p className="text-error text-sm">{errors.projectId.message}</p>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 w-full">
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">
+              Projet parent <span className="text-error">*</span>
+            </legend>
+            <select
+              {...register("projectId", {
+                required: "Sélectionnez un projet",
+                validate: value => value !== "" || "Sélectionnez un projet"
+              })}
+              className={`select w-full ${errors.projectId ? "select-error" : ""}`}
+              disabled={loading}
+            >
+              <option value="">Choisir un projet...</option>
+              {loading ? (
+                <option disabled>Chargement des projets...</option>
+              ) : (
+                projects.map((projet) => (
+                  <option key={projet.id} value={projet.id}>
+                    {projet.title}
+                  </option>
+                ))
               )}
-              <p className="text-xs text-base-content/70">
-                Sélectionnez le projet auquel lier cette documentation
-              </p>
-            </div>
+            </select>
+            {errors.projectId ? (
+              <p className="label text-error">{errors.projectId.message}</p>
+            ) : (
+              <p className="label">Sélectionnez le projet auquel lier cette documentation</p>
+            )}
+          </fieldset>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-base-content">
-                Titre de la documentation <span className="text-error">*</span>
-              </label>
-              <input
-                {...register("title", {
-                  required: "Titre obligatoire",
-                })}
-                type="text"
-                placeholder="Titre de la documentation"
-                className="border border-base-300 rounded-md px-3 py-2 text-sm"
-              />
-              {errors.title && (
-                <p className="text-error text-sm">{errors.title.message}</p>
-              )}
-            </div>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">
+              Titre de la documentation <span className="text-error">*</span>
+            </legend>
+            <input
+              {...register("title", {
+                required: "Titre obligatoire",
+              })}
+              type="text"
+              placeholder="Titre de la documentation"
+              className={`input w-full ${errors.title ? "input-error" : ""}`}
+            />
+            {errors.title && (
+              <p className="label text-error">{errors.title.message}</p>
+            )}
+          </fieldset>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-base-content">
-                Extrait
-              </label>
-              <textarea
-                {...register("excerpt", {
-                  maxLength: {
-                    value: 50,
-                    message: "Maximum 50 caractères"
-                  }
-                })}
-                placeholder="Courte description"
-                className="border border-base-300 rounded-md px-3 py-2 text-sm resize-none"
-                rows="2"
-              />
-              {errors.excerpt && (
-                <p className="text-error text-sm">{errors.excerpt.message}</p>
-              )}
-              <p className="text-xs text-base-content/70">
-                Résumé court (optionnel, max 50 caractères)
-              </p>
-            </div>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Extrait</legend>
+            <textarea
+              {...register("excerpt", {
+                maxLength: {
+                  value: 50,
+                  message: "Maximum 50 caractères"
+                }
+              })}
+              placeholder="Courte description"
+              className={`textarea w-full resize-none ${errors.excerpt ? "textarea-error" : ""}`}
+              rows="2"
+            />
+            {errors.excerpt ? (
+              <p className="label text-error">{errors.excerpt.message}</p>
+            ) : (
+              <p className="label">Résumé court (optionnel, max 50 caractères)</p>
+            )}
+          </fieldset>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-base-content">
-                Contenu <span className="text-error">*</span>
-              </label>
-              <textarea
-                {...register("content", {
-                  required: "Contenu obligatoire",
-                  maxLength: {
-                    value: 10000,
-                    message: "Maximum 10000 caractères"
-                  }
-                })}
-                placeholder="Contenu de la documentation"
-                className="border border-base-300 rounded-md px-3 py-2 text-sm min-h-32"
-              />
-              {errors.content && (
-                <p className="text-error text-sm">{errors.content.message}</p>
-              )}
-              <div className="flex justify-between">
-                <p className="text-xs text-base-content/70">
-                  Contenu principal en Markdown
-                </p>
-                <p className="text-xs text-base-content/70">
-                  {content.length}/10000 caractères
-                </p>
-              </div>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">
+              Contenu <span className="text-error">*</span>
+            </legend>
+            <textarea
+              {...register("content", {
+                required: "Contenu obligatoire",
+                maxLength: {
+                  value: 10000,
+                  message: "Maximum 10000 caractères"
+                }
+              })}
+              placeholder="Contenu de la documentation"
+              className={`textarea w-full min-h-32 ${errors.content ? "textarea-error" : ""}`}
+            />
+            {errors.content && (
+              <p className="label text-error">{errors.content.message}</p>
+            )}
+            <div className="label justify-between">
+              <span>Contenu principal en Markdown</span>
+              <span>{content.length}/10000 caractères</span>
             </div>
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={isSubmitting || !selectedProjectId}
-                className="flex-1 bg-red-primary hover:bg-red-secondary text-white font-medium py-2.5 rounded-md transition-colors"
-              >
-                {isSubmitting ? "Création..." : "Créer la documentation"}
-              </button>
-            </div>
-          </form>
-        </div>
-        <label className="modal-backdrop" htmlFor="doc-modal">Close</label>
+          </fieldset>
+
+          <button
+            type="submit"
+            disabled={isSubmitting || !selectedProjectId}
+            className="btn btn-primary w-full mt-4"
+          >
+            {isSubmitting ? "Création..." : "Créer la documentation"}
+          </button>
+        </form>
       </div>
-    </div>
+      <form method="dialog" className="modal-backdrop">
+        <button>Fermer</button>
+      </form>
+    </dialog>
   );
 };
 

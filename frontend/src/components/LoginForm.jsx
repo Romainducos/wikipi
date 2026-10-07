@@ -82,7 +82,7 @@ const LoginForm = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn bg-red-primary text-white px-6 py-3 font-normal text-[16px] rounded-md w-full"
+                className="btn btn-primary font-normal text-[16px] w-full"
               >
                 {isSubmitting ? "Chargement..." : "Connexion"}
               </button>

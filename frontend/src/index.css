@@ -1,6 +1,45 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: light --default;
+  themes: false;
+}
+
+/* Thème clair WikiPi : base daisyUI "light" + rouge de la marque */
+@plugin "daisyui/theme" {
+  name: "wikipi-light";
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(21% 0.006 285.885);
+
+  --color-primary: #DC2626;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: oklch(65% 0.241 354.308);
+  --color-secondary-content: oklch(94% 0.028 342.258);
+  --color-accent: oklch(77% 0.152 181.912);
+  --color-accent-content: oklch(38% 0.063 188.416);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: #DC2626;
+  --color-error-content: #FFFFFF;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
 /* Thème sombre WikiPi : anthracite neutre + rouge de la marque */
@@ -43,9 +82,7 @@
 }
 
 @theme{
-  --color-red-primary: #DC2626;
   --color-red-secondary: #B91C1C;
-  --color-red-terciary: #991B1B;
   --color-text-primary: #1F2937;
   --color-text-secondary: #6B7280;
   --color-text-terciary: #9CA4AF;
@@ -54,10 +91,8 @@
 
 /* Valeurs des tokens WikiPi en thème sombre */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-red-primary: #E5484D;
+  :root:not([data-theme="wikipi-light"]) {
     --color-red-secondary: #8E1F24;
-    --color-red-terciary: #6B171B;
     --color-text-primary: #EDEDEF;
     --color-text-secondary: #A0A0A8;
     --color-text-terciary: #6E6E76;
@@ -66,9 +101,7 @@
 }
 
 :root[data-theme="wikipi-dark"] {
-  --color-red-primary: #E5484D;
   --color-red-secondary: #8E1F24;
-  --color-red-terciary: #6B171B;
   --color-text-primary: #EDEDEF;
   --color-text-secondary: #A0A0A8;
   --color-text-terciary: #6E6E76;

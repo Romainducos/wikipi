@@ -52,9 +52,9 @@ const SidebarProjet = ({ project }) => {
         </summary>
         <ul>
           <li>
-            <label htmlFor="doc-modal" className="btn" onClick={handleNewDoc}>
+            <button type="button" className="btn" onClick={handleNewDoc}>
               <MdAdd /> Nouvelle Documentation
-            </label>
+            </button>
           </li>
 
           {error && <li className="text-sm text-error">{error}</li>}

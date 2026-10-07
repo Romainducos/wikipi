@@ -8,7 +8,7 @@ const DocumentPage = ({ project, documentation }) => {
             <h2 className="text-3xl font-bold">{documentation?.title || "Documentation inconnue"}</h2>
           </div>
           {documentation && (
-            <button className="text-text-link hover:cursor-pointer hover:underline">
+            <button type="button" className="btn btn-link">
               Soumettre une modification
             </button>
           )}
