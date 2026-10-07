@@ -14,6 +14,7 @@ export const authorize = (...allowedRoles) => {
   };
 };
 
-export const isAdmin = authorize("admin");
+// Le super admin a tous les droits d'un admin
+export const isAdmin = authorize("superadmin", "admin");
 
-export const isModeratorOrAdmin = authorize("admin", "modo");
+export const isModeratorOrAdmin = authorize("superadmin", "admin", "modo");

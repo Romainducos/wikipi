@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --watch --env-file=.env index.js",
-    "migrate": "node --env-file=.env db/migrate.js"
+    "migrate": "node --env-file=.env db/migrate.js",
+    "set-superadmin": "node --env-file=.env db/set-superadmin.js"
   },
   "keywords": [],
   "author": "",

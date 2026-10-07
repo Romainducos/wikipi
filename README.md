@@ -11,7 +11,7 @@
 - 🔐 Inscription et connexion sécurisées (JWT + bcrypt, limite de tentatives)
 - 🔑 Mot de passe oublié : lien de réinitialisation par email (valable 1 h)
 - 👤 Paramètres du compte : nom, email, photo de profil, mot de passe, thème clair / sombre
-- 🎭 Système de rôles (admin, modo, member), avec demande pour devenir modérateur
+- 🎭 Système de rôles (super admin, admin, modo, member), avec demande pour devenir modérateur
 - 🛡️ Routes protégées côté frontend et backend
 
 ### Gestion des Projets
@@ -315,6 +315,17 @@ Toutes les routes sauf l'inscription, la connexion et le mot de passe oublié de
 
 ---
 
+## 🎭 Rôles
+
+| Rôle | Droits |
+| --- | --- |
+| **Super admin** (un seul) | Tout ce que fait un admin + nomme et retire les admins |
+| **Admin** | Tableau de bord, voit tous les projets, valide les demandes de modération, passe un membre en modo et inversement (ne touche pas aux autres admins) |
+| **Modo** | Modifie toutes les documentations, valide les propositions |
+| **Membre** | Crée ses projets et docs, propose des modifications |
+
+Le super admin ne se nomme pas depuis l'application : `npm run set-superadmin -- <email>` (ajouter `--transfer` pour passer le rôle à quelqu'un d'autre). La base garantit qu'il n'y en a qu'un.
+
 ## 🔐 Sécurité
 
 - **Mots de passe** : Hashés avec bcrypt (salt rounds: 10)
@@ -344,6 +355,7 @@ npm run lint     # Analyse le code avec ESLint
 ```bash
 npm start        # Démarre le serveur (node --watch : redémarre à chaque modification)
 npm run migrate  # Crée / met à jour les tables de la base
+npm run set-superadmin -- <email> [--transfer]  # Désigne le super admin (un seul possible)
 ```
 
 ---

@@ -2,7 +2,9 @@
 // Toutes les requêtes et vérifications de droits passent par ici.
 // `user` vient de verifyToken : id, role, group_id, group_role.
 
-const isAdmin = (user) => user.role === "admin";
+// Le super admin a tous les droits d'un admin
+export const isAdminRole = (role) => role === "admin" || role === "superadmin";
+const isAdmin = (user) => isAdminRole(user.role);
 const isModerator = (user) => user.role === "modo";
 
 // Owner du groupe auquel appartient le projet

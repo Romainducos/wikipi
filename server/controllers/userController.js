@@ -4,6 +4,18 @@ import { removeUpload } from "../lib/uploads.js";
 
 const PROFILE_FIELDS = "id, name, email, role, avatar_url, created_at";
 
+// Qui peut changer quel rôle :
+// - super admin : tout le monde sauf lui-même, vers admin / modo / membre
+// - admin : seulement modo <-> membre (jamais un admin ni le super admin)
+const canChangeRole = (actorRole, targetRole, newRole) => {
+  if (targetRole === "superadmin") return false;
+  if (actorRole === "superadmin") return true;
+  if (actorRole === "admin") {
+    return ["modo", "member"].includes(targetRole) && ["modo", "member"].includes(newRole);
+  }
+  return false;
+};
+
 const getProfile = async (userId) => {
   const [rows] = await pool.query(
     `SELECT ${PROFILE_FIELDS} FROM users WHERE id = ?`,
@@ -138,15 +150,22 @@ export const updateUserRole = async (req, res) => {
     return res.status(400).json({ message: "Vous ne pouvez pas changer votre propre rôle" });
   }
 
+  // « superadmin » ne s'attribue jamais via l'API (script serveur uniquement)
   const validRoles = ["admin", "modo", "member"];
   if (!validRoles.includes(role)) {
     return res.status(400).json({ message: "Rôle invalide" });
   }
 
   try {
-    const [rows] = await pool.query("SELECT id FROM users WHERE id = ?", [id]);
+    const [rows] = await pool.query("SELECT id, role FROM users WHERE id = ?", [id]);
     if (rows.length === 0) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    if (!canChangeRole(req.user.role, rows[0].role, role)) {
+      return res.status(403).json({
+        message: "Seul le super admin peut gérer les administrateurs",
+      });
     }
 
     await pool.query("UPDATE users SET role = ? WHERE id = ?", [role, id]);

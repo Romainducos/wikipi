@@ -1,5 +1,5 @@
 import { pool } from "../lib/db.js";
-import { canManageGroup } from "../lib/access.js";
+import { canManageGroup, isAdminRole } from "../lib/access.js";
 
 const getMembers = async (groupId) => {
   const [members] = await pool.query(
@@ -96,7 +96,7 @@ export const countMyInvitations = async (req, res) => {
 
 export const getGroup = async (req, res) => {
   const groupId = Number(req.params.id);
-  if (req.user.role !== "admin" && req.user.group_id !== groupId) {
+  if (!isAdminRole(req.user.role) && req.user.group_id !== groupId) {
     return res.status(404).json({ message: "Groupe introuvable" });
   }
   try {

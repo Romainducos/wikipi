@@ -5,6 +5,7 @@ import { NavLink, useLocation } from "react-router-dom"
 import { useAuth } from '../../hooks/useAuth'
 import { api, assetUrl } from '../../api'
 import { subscribe, PROPOSALS_CHANGED, GROUPS_CHANGED } from '../../events'
+import { isAdminRole, ROLE_LABELS } from '../../roles'
 
 // Compteurs de la navbar : propositions à relire et invitations reçues
 const useNotificationCounts = (enabled) => {
@@ -66,8 +67,11 @@ const Navbar = () => {
           <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 mt-12 shadow-lg"> {/* Dropdown menu */}
             <li className="menu-title border-b-1 border-base-300">
               {authUser?.user.name || 'User'}
+              {authUser && authUser.user.role !== 'member' && (
+                <span className="block text-xs font-normal">{ROLE_LABELS[authUser.user.role]}</span>
+              )}
             </li>
-            {authUser?.user.role === 'admin' && (
+            {isAdminRole(authUser?.user.role) && (
               <li><NavLink to="/admin">Tableau de bord Admin</NavLink></li>
             )}
             <li>

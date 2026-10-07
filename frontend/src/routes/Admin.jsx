@@ -4,8 +4,7 @@ import { useAuthProtection } from '../hooks/useAuthProtection';
 import { api } from '../api';
 import AppLayout from "../components/Layout/AppLayout"
 import Dashboard from "../components/Layout/Dashboard"
-
-const ROLE_LABELS = { admin: "Admin", modo: "Modérateur", member: "Membre" }
+import { ROLE_LABELS, isAdminRole, assignableRoles } from "../roles"
 const formatDate = (date) => new Date(date).toLocaleDateString("fr-FR")
 
 const Card = ({ title, children }) => (
@@ -63,7 +62,8 @@ const ModeratorRequestRow = ({ request, onDone }) => {
 const Admin = () => {
   const { loading: authLoading } = useAuthProtection();
   const { user: authUser } = useAuth();
-  const isAdmin = authUser?.user.role === 'admin';
+  const myRole = authUser?.user.role;
+  const isAdmin = isAdminRole(myRole);
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [requests, setRequests] = useState([]);
@@ -148,29 +148,39 @@ const Admin = () => {
                     <tr><th>Nom</th><th>Email</th><th>Inscrit le</th><th>Rôle</th></tr>
                   </thead>
                   <tbody>
-                    {users.map((user) => (
-                      <tr key={user.id}>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>{formatDate(user.created_at)}</td>
-                        <td>
-                          {user.id === authUser.user.id ? (
-                            <span className="badge badge-primary badge-soft">{ROLE_LABELS[user.role]} (vous)</span>
-                          ) : (
-                            <select
-                              value={user.role}
-                              onChange={(e) => changeRole(user, e.target.value)}
-                              aria-label={`Rôle de ${user.name}`}
-                              className="select select-sm"
-                            >
-                              {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                                <option key={value} value={value}>{label}</option>
-                              ))}
-                            </select>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {users.map((user) => {
+                      const isMe = user.id === authUser.user.id
+                      const choices = isMe ? [] : assignableRoles(myRole, user.role)
+                      return (
+                        <tr key={user.id}>
+                          <td>{user.name}</td>
+                          <td>{user.email}</td>
+                          <td>{formatDate(user.created_at)}</td>
+                          <td>
+                            {choices.length > 0 ? (
+                              <select
+                                value={user.role}
+                                onChange={(e) => changeRole(user, e.target.value)}
+                                aria-label={`Rôle de ${user.name}`}
+                                className="select select-sm"
+                              >
+                                {/* Le rôle actuel reste affiché même s'il n'est pas attribuable */}
+                                {[...new Set([user.role, ...choices])].map((value) => (
+                                  <option key={value} value={value}>{ROLE_LABELS[value]}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span
+                                className={`badge ${isAdminRole(user.role) ? "badge-primary badge-soft" : "badge-outline"}`}
+                                title={isMe ? undefined : "Seul le super admin peut gérer les administrateurs"}
+                              >
+                                {ROLE_LABELS[user.role]}{isMe && " (vous)"}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
